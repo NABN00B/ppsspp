@@ -345,19 +345,20 @@ class BouncingLogoAnimation : public Animation {
 	
 			// Scale certain attributes to resolution.
 			if (xres < yres) {
-				scale = yres / 400.0f;
-				xspeed = yres / 400.0f * 0.77f;
-				yspeed = yres / 400.0f * 0.77f;
+				scale = yres / 300.0f;
+				xspeed = yres / 300.0f * 0.77f;
+				yspeed = yres / 300.0f * 0.77f;
 			} else {
 				scale = xres / 400.0f;
-				xspeed = xres / 400.0f * 0.77f;
-				yspeed = xres / 400.0f * 0.77f;
+				xspeed = xres / 400.0f * 0.58f;
+				yspeed = xres / 400.0f * 0.58f;
 			}
-			border = 30.0f / scale;
+	
+			border = 30.0f * scale;
 	
 			// Determine initial directions.
-			if ((int)(rng.F() * xspeed) % 2) xspeed *= -1.0f;
-			if ((int)(rng.F() * yspeed) % 2) yspeed *= -1.0f;
+			if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
+			if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
 		}
 };
 
