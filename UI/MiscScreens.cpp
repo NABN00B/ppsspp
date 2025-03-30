@@ -288,6 +288,39 @@ private:
 	double nextT_ = -INTERVAL;
 };
 
+class BouncingLogoAnimation : public Animation {
+	public:
+		void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
+			dc.Flush();
+			dc.Begin();
+			float xres = dc.GetBounds().w;
+			float yres = dc.GetBounds().h;
+			if (last_xres != xres || last_yres != yres) {
+				Regenerate(xres, yres);
+			}
+	
+			float x = xbase + dc.GetBounds().x;
+			float y = ybase + dc.GetBounds().y;
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_LOGO"),
+					x, y, 1.0f, colorAlpha(0xFF0000FF, alpha * 0.1f), ALIGN_CENTER);
+			dc.Flush();
+		}
+	
+	private:
+		float xbase = 0;
+		float ybase = 0;	
+		float last_xres = 0;
+		float last_yres = 0;
+	
+		void Regenerate(int xres, int yres) {
+			xbase = xres / 2.0f;
+			ybase = yres / 2.0f;
+	
+			last_xres = xres;
+			last_yres = yres;
+		}
+};
+
 // TODO: Add more styles. Remember to add to the enum in ConfigValues.h and the selector in GameSettings too.
 
 static BackgroundAnimation g_CurBackgroundAnimation = BackgroundAnimation::OFF;
@@ -333,6 +366,9 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 			break;
 		case BackgroundAnimation::MOVING_BACKGROUND:
 			g_Animation.reset(new MovingBackground());
+			break;
+		case BackgroundAnimation::BOUNCING_LOGO:
+			g_Animation.reset(new BouncingLogoAnimation());
 			break;
 		default:
 			g_Animation.reset(nullptr);
