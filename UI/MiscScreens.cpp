@@ -302,11 +302,11 @@ class BouncingLogoAnimation : public Animation {
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
 			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
-					xpos, ypos, 1.0f, colorAlpha(0xFF0000FF, 1.0f), ALIGN_CENTER);
+					xpos, ypos, scale, colorAlpha(0x000000FF, 1.0f), ALIGN_CENTER);
 			dc.Flush();
 	
-			if (xbase >= xres - 30.0f) xspeed *= -1.0;
-			if (ybase >= yres - 30.0f) yspeed *= -1.0;
+			if (xbase >= xres - 30.0f || xbase <= 30.f) xspeed *= -1.0f;
+			if (ybase >= yres - 30.0f || ybase <= 30.f) yspeed *= -1.0f;
 			xbase += xspeed;
 			ybase += yspeed;
 		}
@@ -318,6 +318,7 @@ class BouncingLogoAnimation : public Animation {
 		float last_yres = 0;
 		float xspeed = 2.3f;
 		float yspeed = 2.3f;
+		float scale = 1.0f;
 	
 		void Regenerate(int xres, int yres) {
 			xbase = xres / 2.0f;
@@ -325,9 +326,19 @@ class BouncingLogoAnimation : public Animation {
 			last_xres = xres;
 			last_yres = yres;
 	
+			if (xres < yres) {
+				scale = yres / 400.0f;
+				xspeed = yres / 400.0f * 0.77f;
+				yspeed = yres / 400.0f * 0.77f;
+			} else {
+				scale = xres / 400.0f;
+				xspeed = xres / 400.0f * 0.77f;
+				yspeed = xres / 400.0f * 0.77f;
+			}
+	
 			GMRng rng;
-			if (rng.R32() % 2) xspeed *= -1.0;
-			if (rng.R32() % 2) yspeed *= -1.0;
+			if (rng.R32() % 2) xspeed *= -1.0f;
+			if (rng.R32() % 2) yspeed *= -1.0f;
 		}
 };
 
