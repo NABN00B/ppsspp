@@ -288,7 +288,7 @@ private:
 	double nextT_ = -INTERVAL;
 };
 
-class BouncingLogoAnimation : public Animation {
+class BouncingIconAnimation : public Animation {
 	public:
 		void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
 			dc.Flush();
@@ -340,7 +340,7 @@ class BouncingLogoAnimation : public Animation {
 		float yspeed = 2.3f;
 		float scale = 1.0f;
 		float border = 0;
-		float colors[COLORCOUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
+		unsigned int colors[COLORCOUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
 		int colorI = 0;
 		GMRng rng;
 	
@@ -416,8 +416,8 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 		case BackgroundAnimation::MOVING_BACKGROUND:
 			g_Animation.reset(new MovingBackground());
 			break;
-		case BackgroundAnimation::BOUNCING_LOGO:
-			g_Animation.reset(new BouncingLogoAnimation());
+		case BackgroundAnimation::BOUNCING_ICON:
+			g_Animation.reset(new BouncingIconAnimation());
 			break;
 		default:
 			g_Animation.reset(nullptr);
