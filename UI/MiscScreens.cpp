@@ -304,25 +304,25 @@ class BouncingIconAnimation : public Animation {
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"), xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"), xpos, ypos, scale, 0xFF0000FF, ALIGN_CENTER);
 			dc.Flush();
 	
 			// Handle the bouncing.
-			if (xbase > xres - 30.0f || xbase < 30.0f) {
+			if (xbase > xres - border || xbase < border) {
 				xspeed *= -1.0f;
-				colorI = (int)(rng.F() * xres) % COLORCOUNT;
+				colorI = (int)(rng.F() * xres) % COLOR_COUNT;
 			}
 	
-			if (ybase > yres - 30.0f || ybase < 30.0f) {
+			if (ybase > yres - border || ybase < border) {
 				yspeed *= -1.0f;
-				colorI = (int)(rng.F() * yres) % COLORCOUNT;
+				colorI = (int)(rng.F() * yres) % COLOR_COUNT;
 			}
 	
 			// Place to border if out of bounds.
-			if (xbase > xres - 30.0f) xbase = xres - 30.0f;
-			else if (xbase < 30.0f) xbase = 30.0f;
-			if (ybase > yres - 30.0f) ybase = yres - 30.0f;
-			else if (ybase < 30.0f) ybase = 30.0f;
+			if (xbase > xres - border) xbase = xres - border;
+			else if (xbase < border) xbase = border;
+			if (ybase > yres - border) ybase = yres - border;
+			else if (ybase < border) ybase = border;
 	
 			// Update location.
 			xbase += xspeed;
@@ -330,7 +330,7 @@ class BouncingIconAnimation : public Animation {
 		}
 	
 	private:
-		static constexpr int COLORCOUNT = 11;
+		static constexpr int COLOR_COUNT = 11;
 	
 		float xbase = 0;
 		float ybase = 0;	
@@ -340,7 +340,7 @@ class BouncingIconAnimation : public Animation {
 		float yspeed = 2.3f;
 		float scale = 1.0f;
 		float border = 0;
-		unsigned int colors[COLORCOUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
+		Color colors[COLOR_COUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
 		int colorI = 0;
 		GMRng rng;
 	
