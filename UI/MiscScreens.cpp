@@ -304,25 +304,25 @@ class BouncingLogoAnimation : public Animation {
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"), xpos, ypos, scale, colors[1], ALIGN_CENTER);
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"), xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
 			dc.Flush();
 	
 			// Handle the bouncing.
-			if (xbase > xres - border || xbase < border) {
+			if (xbase > xres - 30.0f || xbase < 30.0f) {
 				xspeed *= -1.0f;
 				colorI = (int)(rng.F() * xres) % COLORCOUNT;
 			}
 	
-			if (ybase > yres - border || ybase < border) {
+			if (ybase > yres - 30.0f || ybase < 30.0f) {
 				yspeed *= -1.0f;
 				colorI = (int)(rng.F() * yres) % COLORCOUNT;
 			}
 	
 			// Place to border if out of bounds.
-			if (xbase > xres - border) xbase = xres - border;
-			else if (xbase < border) xbase = border;
-			if (ybase > yres - border) ybase = yres - border;
-			else if (ybase < border) ybase = border;
+			if (xbase > xres - 30.0f) xbase = xres - 30.0f;
+			else if (xbase < 30.0f) xbase = 30.0f;
+			if (ybase > yres - 30.0f) ybase = yres - 30.0f;
+			else if (ybase < 30.0f) ybase = 30.0f;
 	
 			// Update location.
 			xbase += xspeed;
