@@ -299,10 +299,10 @@ class BouncingLogoAnimation : public Animation {
 				Regenerate(xres, yres);
 			}
 	
-			float x = xbase + dc.GetBounds().x;
-			float y = ybase + dc.GetBounds().y;
+			float xpos = xbase + dc.GetBounds().x;
+			float ypos = ybase + dc.GetBounds().y;
 			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_LOGO"),
-					x, y, 1.0f, colorAlpha(0xFF0000FF, alpha * 0.1f), ALIGN_CENTER);
+					xpos, ypos, 1.0f, colorAlpha(0xFF0000FF, alpha * 0.1f), ALIGN_CENTER);
 			dc.Flush();
 		}
 	
