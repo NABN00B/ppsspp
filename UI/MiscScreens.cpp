@@ -301,9 +301,14 @@ class BouncingLogoAnimation : public Animation {
 	
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_LOGO"),
-					xpos, ypos, 1.0f, colorAlpha(0xFF0000FF, alpha * 0.1f), ALIGN_CENTER);
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
+					xpos, ypos, 1.0f, colorAlpha(0xFF0000FF, 1.0f), ALIGN_CENTER);
 			dc.Flush();
+	
+			if (xbase >= w - 30.0f) xspeed *= -1.0;
+			if (ybase >= h - 30.0f) yspeed *= -1.0;
+			xbase += xspeed;
+			ybase += yspeed;
 		}
 	
 	private:
@@ -311,13 +316,18 @@ class BouncingLogoAnimation : public Animation {
 		float ybase = 0;	
 		float last_xres = 0;
 		float last_yres = 0;
+		float xspeed = 2.3f;
+		float yspeed = 2.3f;
 	
 		void Regenerate(int xres, int yres) {
 			xbase = xres / 2.0f;
 			ybase = yres / 2.0f;
-	
 			last_xres = xres;
 			last_yres = yres;
+	
+			GMRng rng;
+			if (rng.R32() % 2) xspeed *= -1.0;
+			if (rng.R32() % 2) yspeed *= -1.0;
 		}
 };
 
