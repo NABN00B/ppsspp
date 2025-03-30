@@ -308,12 +308,12 @@ class BouncingLogoAnimation : public Animation {
 			dc.Flush();
 	
 			// Handle the bouncing.
-			if (xbase >= xres - 30.0f || xbase <= 30.f) {
+			if (xbase >= xres - border || xbase <= border) {
 				xspeed *= -1.0f;
 				colorI = (int)(rng.F() * xres) % 11;
 			}
 	
-			if (ybase >= yres - 30.0f || ybase <= 30.f) {
+			if (ybase >= yres - border || ybase <= border) {
 				yspeed *= -1.0f;
 				colorI = (int)(rng.F() * yres) % 11;
 			}
@@ -331,7 +331,8 @@ class BouncingLogoAnimation : public Animation {
 		float xspeed = 2.3f;
 		float yspeed = 2.3f;
 		float scale = 1.0f;
-		float colors[] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
+		float border = 0;
+		float colors[11] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
 		int colorI = 0;
 		GMRng rng;
 	
@@ -352,6 +353,7 @@ class BouncingLogoAnimation : public Animation {
 				xspeed = xres / 400.0f * 0.77f;
 				yspeed = xres / 400.0f * 0.77f;
 			}
+			border = 30.0f / scale;
 	
 			// Determine initial directions.
 			if ((int)(rng.F() * xspeed) % 2) xspeed *= -1.0f;
