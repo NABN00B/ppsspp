@@ -332,8 +332,8 @@ class BouncingIconAnimation : public Animation {
 	
 	private:
 		static constexpr int COLOR_COUNT = 11;
-		static constexpr uint32_t colors[COLOR_COUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00,
-				0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
+		static constexpr uint32_t colors[COLOR_COUNT] = { 0x00000000, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF00FF00,
+				0xFF00FFFF, 0xFFFF00FF, 0xFF4111D1, 0xFF3577F3, 0xFFAA77FF, 0xFF623B84 };
 	
 		float xbase = 0;
 		float ybase = 0;	
