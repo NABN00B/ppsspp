@@ -304,7 +304,8 @@ class BouncingIconAnimation : public Animation {
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"), xpos, ypos, scale, this->colors[colorI], ALIGN_CENTER);
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
+					xpos, ypos, scale, this->colors[1], ALIGN_CENTER);
 			dc.Flush();
 	
 			// Handle the bouncing.
@@ -331,6 +332,8 @@ class BouncingIconAnimation : public Animation {
 	
 	private:
 		static constexpr int COLOR_COUNT = 11;
+		static const uint32_t colors[COLOR_COUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00,
+				0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
 	
 		float xbase = 0;
 		float ybase = 0;	
@@ -340,7 +343,6 @@ class BouncingIconAnimation : public Animation {
 		float yspeed = 2.3f;
 		float scale = 1.0f;
 		float border = 0;
-		Color colors[COLOR_COUNT] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
 		int colorI = 0;
 		GMRng rng;
 	
@@ -362,7 +364,7 @@ class BouncingIconAnimation : public Animation {
 				yspeed = xres / 400.0f * 0.58f;
 			}
 	
-			border = 30.0f * scale;
+			border = 32.0f * scale;
 	
 			// Determine initial directions.
 			if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
