@@ -305,8 +305,8 @@ class BouncingLogoAnimation : public Animation {
 					xpos, ypos, 1.0f, colorAlpha(0xFF0000FF, 1.0f), ALIGN_CENTER);
 			dc.Flush();
 	
-			if (xbase >= w - 30.0f) xspeed *= -1.0;
-			if (ybase >= h - 30.0f) yspeed *= -1.0;
+			if (xbase >= xres - 30.0f) xspeed *= -1.0;
+			if (ybase >= yres - 30.0f) yspeed *= -1.0;
 			xbase += xspeed;
 			ybase += yspeed;
 		}
