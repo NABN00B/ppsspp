@@ -304,8 +304,8 @@ class BouncingIconAnimation : public Animation {
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
-					xpos, ypos, scale, this->colors[1], ALIGN_CENTER);
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICONGOLD"),
+					xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
 			dc.Flush();
 	
 			// Handle the bouncing.
@@ -332,7 +332,7 @@ class BouncingIconAnimation : public Animation {
 	
 	private:
 		static constexpr int COLOR_COUNT = 11;
-		static constexpr uint32_t colors[COLOR_COUNT] = { 0x00000000, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF00FF00,
+		static constexpr Color colors[COLOR_COUNT] = { 0x00000000, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF00FF00,
 				0xFF00FFFF, 0xFFFF00FF, 0xFF4111D1, 0xFF3577F3, 0xFFAA77FF, 0xFF623B84 };
 	
 		float xbase = 0;
@@ -354,15 +354,15 @@ class BouncingIconAnimation : public Animation {
 			colorI = 0;
 	
 			// Scale certain attributes to resolution.
-			if (xres > yres) {
+			/*if (xres > yres) {
 				scale = yres / 300.0f;
 				xspeed = yres / 300.0f * 0.77f;
 				yspeed = yres / 300.0f * 0.77f;
-			} else {
+			} else {*/
 				scale = xres / 400.0f;
 				xspeed = xres / 400.0f * 0.58f;
 				yspeed = xres / 400.0f * 0.58f;
-			}
+			//}
 	
 			border = 32.0f * scale;
 	
