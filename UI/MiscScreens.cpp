@@ -293,20 +293,32 @@ class BouncingLogoAnimation : public Animation {
 		void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
 			dc.Flush();
 			dc.Begin();
+			
+			// Handle the resolution.
 			float xres = dc.GetBounds().w;
 			float yres = dc.GetBounds().h;
 			if (last_xres != xres || last_yres != yres) {
 				Regenerate(xres, yres);
 			}
 	
+			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
-					xpos, ypos, scale, colorAlpha(0x000000FF, 1.0f), ALIGN_CENTER);
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"), xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
 			dc.Flush();
 	
-			if (xbase >= xres - 30.0f || xbase <= 30.f) xspeed *= -1.0f;
-			if (ybase >= yres - 30.0f || ybase <= 30.f) yspeed *= -1.0f;
+			// Handle the bouncing.
+			if (xbase >= xres - 30.0f || xbase <= 30.f) {
+				xspeed *= -1.0f;
+				colorI = (int)(rng.F() * xres) % 11;
+			}
+	
+			if (ybase >= yres - 30.0f || ybase <= 30.f) {
+				yspeed *= -1.0f;
+				colorI = (int)(rng.F() * yres) % 11;
+			}
+	
+			// Update location.
 			xbase += xspeed;
 			ybase += yspeed;
 		}
@@ -319,13 +331,18 @@ class BouncingLogoAnimation : public Animation {
 		float xspeed = 2.3f;
 		float yspeed = 2.3f;
 		float scale = 1.0f;
+		float colors[] = { 0x00000000, 0x00FFFF00, 0x00FF0000, 0x0000FF00, 0x0000FF00, 0x0000FFFF, 0x00FF00FF, 0x004111D1, 0x003577F3, 0x00AA77FF, 0x00623B84 };
+		int colorI = 0;
+		GMRng rng;
 	
 		void Regenerate(int xres, int yres) {
 			xbase = xres / 2.0f;
 			ybase = yres / 2.0f;
 			last_xres = xres;
 			last_yres = yres;
+			colorI = 0;
 	
+			// Scale certain attributes to resolution.
 			if (xres < yres) {
 				scale = yres / 400.0f;
 				xspeed = yres / 400.0f * 0.77f;
@@ -336,9 +353,9 @@ class BouncingLogoAnimation : public Animation {
 				yspeed = xres / 400.0f * 0.77f;
 			}
 	
-			GMRng rng;
-			if (rng.R32() % 2) xspeed *= -1.0f;
-			if (rng.R32() % 2) yspeed *= -1.0f;
+			// Determine initial directions.
+			if ((int)(rng.F() * xspeed) % 2) xspeed *= -1.0f;
+			if ((int)(rng.F() * yspeed) % 2) yspeed *= -1.0f;
 		}
 };
 
