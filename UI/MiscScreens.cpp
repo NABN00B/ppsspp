@@ -356,8 +356,8 @@ class BouncingIconAnimation : public Animation {
 				ybase = yres / 2.0f;
 	
 				// Determine initial direction.
-				if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
-				if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
+				if ((int)(rng.F() * rng.F()) % 2) xspeed *= -1.0f;
+				if ((int)(rng.F() * rng.F()) % 2) yspeed *= -1.0f;
 				last_color_ix = 0;
 			}
 
