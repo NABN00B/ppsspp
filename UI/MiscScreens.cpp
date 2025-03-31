@@ -149,8 +149,8 @@ public:
 
 			float wave0 = sin(i*0.005+t*0.8)*0.05 + sin(i*0.002+t*0.25)*0.02 + sin(i*0.001+t*0.3)*0.03 + 0.625;
 			float wave1 = sin(i*0.0044+t*0.4)*0.07 + sin(i*0.003+t*0.1)*0.02 + sin(i*0.001+t*0.3)*0.01 + 0.625;
-			dc.Draw()->RectVGradient(x, wave0*bounds.h, nextX, bounds.h, 0xFF0000FF, 0x00000000);
-			dc.Draw()->RectVGradient(x, wave1*bounds.h, nextX, bounds.h, 0xFFFFFF00, 0x00000000);
+			dc.Draw()->RectVGradient(x, wave0*bounds.h, nextX, bounds.h, color, 0x00000000);
+			dc.Draw()->RectVGradient(x, wave1*bounds.h, nextX, bounds.h, color, 0x00000000);
 
 			// Add some "antialiasing"
 			dc.Draw()->RectVGradient(x, wave0*bounds.h-3.0f * g_display.pixel_in_dps, nextX, wave0 * bounds.h, 0x00000000, color);
@@ -293,48 +293,50 @@ class BouncingIconAnimation : public Animation {
 		void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
 			dc.Flush();
 			dc.Begin();
-			
+
 			// Handle change in resolution.
 			float xres = dc.GetBounds().w;
 			float yres = dc.GetBounds().h;
 			if (last_xres != xres || last_yres != yres) {
 				Recalculate(xres, yres);
 			}
-	
+
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
 			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
 					xpos, ypos, scale, colors[color_ix], ALIGN_CENTER);
 			dc.Flush();
-	
+
 			// Switch direction if within border.
 			if (xbase > xres - border || xbase < border) {
 				xspeed *= -1.0f;
 				do color_ix = (int)(rng.F() * xres) % COLOR_COUNT; while (color_ix == last_color_ix);
+				last_color_ix = color_ix;
 			}
-	
+
 			if (ybase > yres - border || ybase < border) {
 				yspeed *= -1.0f;
 				do color_ix = (int)(rng.F() * yres) % COLOR_COUNT; while (color_ix == last_color_ix);
+				last_color_ix = color_ix;
 			}
-	
+
 			// Place to border if out of bounds.
 			if (xbase > xres - border) xbase = xres - border;
 			else if (xbase < border) xbase = border;
 			if (ybase > yres - border) ybase = yres - border;
 			else if (ybase < border) ybase = border;
-	
+
 			// Update location.
 			xbase += xspeed;
 			ybase += yspeed;
 		}
-	
+
 	private:
 		static constexpr int COLOR_COUNT = 11;
-		static constexpr Color colors[COLOR_COUNT] = { 0x00000000, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF00FF00,
+		static constexpr Color colors[COLOR_COUNT] = { 0xFFFFFFFF, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF00FF00,
 				0xFF00FFFF, 0xFFFF00FF, 0xFF4111D1, 0xFF3577F3, 0xFFAA77FF, 0xFF623B84 };
-	
+
 		float xbase = 0.0f;
 		float ybase = 0.0f;	
 		float last_xres = 0.0f;
@@ -346,7 +348,7 @@ class BouncingIconAnimation : public Animation {
 		int color_ix = 0;
 		int last_color_ix = 0;
 		GMRng rng;
-	
+
 		void Recalculate(int xres, int yres) {
 			// First calculation.
 			if (last_xres == 0.0f) {
@@ -357,10 +359,10 @@ class BouncingIconAnimation : public Animation {
 				if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
 				if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
 			}
-	
+
 			last_xres = xres;
 			last_yres = yres;
-	
+
 			// Scale certain attributes to resolution.
 			if (xres > yres) {
 				scale = yres / 400.0f;
@@ -371,7 +373,7 @@ class BouncingIconAnimation : public Animation {
 				xspeed = xres / 400.0f * 1.3f / scale;
 				yspeed = xres / 400.0f * 1.3f / scale;
 			}
-	
+
 			border = 36.0f * scale;
 		}
 };
