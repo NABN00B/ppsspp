@@ -311,13 +311,13 @@ class BouncingIconAnimation : public Animation {
 			// Switch direction if within border.
 			if (xbase > xres - border || xbase < border) {
 				xspeed *= -1.0f;
-				do color_ix = (int)(rng.F() * xres) % COLOR_COUNT; while (color_ix == last_color_ix);
+				do color_ix = rng.U32() * time_now_raw() % COLOR_COUNT; while (color_ix == last_color_ix);
 				last_color_ix = color_ix;
 			}
 
 			if (ybase > yres - border || ybase < border) {
 				yspeed *= -1.0f;
-				do color_ix = (int)(rng.F() * yres) % COLOR_COUNT; while (color_ix == last_color_ix);
+				do color_ix = rng.U32() * time_now_raw() % COLOR_COUNT; while (color_ix == last_color_ix);
 				last_color_ix = color_ix;
 			}
 
@@ -356,8 +356,8 @@ class BouncingIconAnimation : public Animation {
 				ybase = yres / 2.0f;
 	
 				// Determine initial direction.
-				if ((int)(rng.F() * rng.F()) % 2) xspeed *= -1.0f;
-				if ((int)(rng.F() * rng.F()) % 2) yspeed *= -1.0f;
+				if (rng.U32() * time_now_raw() % 2) xspeed *= -1.0f;
+				if (rng.U32() * time_now_raw() % 2) yspeed *= -1.0f;
 				last_color_ix = 0;
 			}
 
