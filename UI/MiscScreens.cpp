@@ -362,7 +362,10 @@ class BouncingIconAnimation : public Animation {
 			}
 
 			// Scale certain attributes to resolution.
-			if (xres > yres) {
+			scale = std::min(xres, yres) / 400.0f;
+			xspeed = scale * 1.1f;
+			yspeed = scale * 1.1f;
+			/*if (xres > yres) {
 				scale = yres / 400.0f;
 				xspeed = yres / 400.0f * 1.1f / scale;
 				yspeed = yres / 400.0f * 1.1f / scale;
@@ -370,7 +373,7 @@ class BouncingIconAnimation : public Animation {
 				scale = xres / 400.0f;
 				xspeed = xres / 400.0f * 1.1f / scale;
 				yspeed = xres / 400.0f * 1.1f / scale;
-			}
+			}*/
 
 			border = 35.0f * scale;
 			last_xres = xres;
