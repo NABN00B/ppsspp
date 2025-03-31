@@ -304,7 +304,7 @@ class BouncingIconAnimation : public Animation {
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICONGOLD"),
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
 					xpos, ypos, scale, colors[color_ix], ALIGN_CENTER);
 			dc.Flush();
 
@@ -354,15 +354,17 @@ class BouncingIconAnimation : public Animation {
 				ybase = yres / 2.0f;
 	
 				// Determine initial direction.
-				if ((int)(rng.F() * time_now_unix_utc()) % 2) xspeed *= -1.0f;
-				if ((int)(rng.F() * time_now_unix_utc()) % 2) yspeed *= -1.0f;
+				if ((int)(rng.F()) % 2) xspeed *= -1.0f;
+				if ((int)(rng.F()) % 2) yspeed *= -1.0f;
 				last_color_ix = 0;
 			}
 
 			// Scale certain attributes to resolution.
-			scale = std::min(xres, yres) / 400.0f;
-			xspeed = scale > 1.0f ? scale * 0.9f : scale * 1.1f;
-			yspeed = scale > 1.0f ? scale * 0.9f : scale * 1.1f;
+			float smaller = std::min(xres, yres);
+			scale = smaller / 400.0f;
+			float factor = smaller / std::max(xres, yres);
+			xspeed = factor > 0.8f ? scale * 0.58f : scale * 0.9f;
+			yspeed = factor > 0.8f ? scale * 0.58f : scale * 0.9f;
 			/*if (xres > yres) {
 				scale = yres / 400.0f;
 				xspeed = yres / 400.0f * 1.1f / scale;
