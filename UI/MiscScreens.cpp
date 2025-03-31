@@ -346,35 +346,35 @@ class BouncingIconAnimation : public Animation {
 		float scale = 0.0f;
 		float border = 0.0f;
 		int color_ix = 0;
-		int last_color_ix = 0;
+		int last_color_ix = -1;
 		GMRng rng;
 
 		void Recalculate(int xres, int yres) {
 			// First calculation.
-			if (last_xres == 0.0f) {
+			if (last_color_ix == -1) {
 				xbase = xres / 2.0f;
 				ybase = yres / 2.0f;
 	
 				// Determine initial direction.
 				if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
 				if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
+				last_color_ix = 0;
 			}
-
-			last_xres = xres;
-			last_yres = yres;
 
 			// Scale certain attributes to resolution.
 			if (xres > yres) {
 				scale = yres / 400.0f;
-				xspeed = yres / 400.0f * 1.3f / scale;
-				yspeed = yres / 400.0f * 1.3f / scale;
+				xspeed = yres / 400.0f * 1.1f / scale;
+				yspeed = yres / 400.0f * 1.1f / scale;
 			} else {
 				scale = xres / 400.0f;
-				xspeed = xres / 400.0f * 1.3f / scale;
-				yspeed = xres / 400.0f * 1.3f / scale;
+				xspeed = xres / 400.0f * 1.1f / scale;
+				yspeed = xres / 400.0f * 1.1f / scale;
 			}
 
-			border = 36.0f * scale;
+			border = 35.0f * scale;
+			last_xres = xres;
+			last_yres = yres;
 		}
 };
 
