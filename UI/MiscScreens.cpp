@@ -354,8 +354,8 @@ class BouncingIconAnimation : public Animation {
 				ybase = yres / 2.0f;
 	
 				// Determine initial direction.
-				if ((int)(rng.F()) % 2) xspeed *= -1.0f;
-				if ((int)(rng.F()) % 2) yspeed *= -1.0f;
+				if (rng.R32() % 2) xspeed *= -1.0f;
+				if (rng.R32() % 2) yspeed *= -1.0f;
 				last_color_ix = 0;
 			}
 
@@ -363,8 +363,8 @@ class BouncingIconAnimation : public Animation {
 			float smaller = std::min(xres, yres);
 			scale = smaller / 400.0f;
 			float factor = smaller / std::max(xres, yres);
-			xspeed = factor > 0.8f ? scale * 0.58f : scale * 0.9f;
-			yspeed = factor > 0.8f ? scale * 0.58f : scale * 0.9f;
+			xspeed = factor > 0.66f ? scale * 0.58f : scale * 0.9f;
+			yspeed = factor > 0.66f ? scale * 0.58f : scale * 0.9f;
 			/*if (xres > yres) {
 				scale = yres / 400.0f;
 				xspeed = yres / 400.0f * 1.1f / scale;
@@ -382,7 +382,7 @@ class BouncingIconAnimation : public Animation {
 
 		void RandomizeColor() {
 			do {
-				color_ix = (int)(rng.F() * time_now_unix_utc()) % COLOR_COUNT;
+				color_ix = rng.R32() % COLOR_COUNT;
 			} while (color_ix == last_color_ix);
 
 			last_color_ix = color_ix;
