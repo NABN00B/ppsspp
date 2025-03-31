@@ -294,17 +294,17 @@ class BouncingIconAnimation : public Animation {
 			dc.Flush();
 			dc.Begin();
 			
-			// Handle the resolution.
+			// Handle change in resolution.
 			float xres = dc.GetBounds().w;
 			float yres = dc.GetBounds().h;
 			if (last_xres != xres || last_yres != yres) {
-				Regenerate(xres, yres);
+				Recalculate(xres, yres);
 			}
 	
 			// Draw the image.
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
-			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICONGOLD"),
+			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
 					xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
 			dc.Flush();
 	
@@ -346,29 +346,32 @@ class BouncingIconAnimation : public Animation {
 		int colorI = 0;
 		GMRng rng;
 	
-		void Regenerate(int xres, int yres) {
-			xbase = xres / 2.0f;
-			ybase = yres / 2.0f;
+		void Recalculate(int xres, int yres) {
+			// First calculation.
+			if (!last_xres) {
+				xbase = xres / 2.0f;
+				ybase = yres / 2.0f;
+	
+				// Determine initial direction.
+				if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
+				if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
+			}
+	
 			last_xres = xres;
 			last_yres = yres;
-			colorI = 0;
 	
 			// Scale certain attributes to resolution.
 			if (xres > yres) {
 				scale = yres / 400.0f;
-				xspeed = yres / 400.0f * 0.58f / scale;
-				yspeed = yres / 400.0f * 0.58f / scale;
+				xspeed = yres / 400.0f * 2.3f / scale;
+				yspeed = yres / 400.0f * 2.3f / scale;
 			} else {
 				scale = xres / 400.0f;
-				xspeed = xres / 400.0f * 0.58f / scale;
-				yspeed = xres / 400.0f * 0.58f / scale;
+				xspeed = xres / 400.0f * 2.3f / scale;
+				yspeed = xres / 400.0f * 2.3f / scale;
 			}
 	
 			border = 32.0f * scale;
-	
-			// Determine initial directions.
-			if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
-			if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
 		}
 };
 
