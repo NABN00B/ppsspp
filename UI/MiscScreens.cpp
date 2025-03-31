@@ -362,7 +362,7 @@ class BouncingIconAnimation : public Animation {
 			}
 
 			// Scale certain attributes to resolution.
-			if (xres > yres) {
+			if (xres < yres) {
 				scale = yres / 400.0f;
 				xspeed = yres / 400.0f * 1.1f / scale;
 				yspeed = yres / 400.0f * 1.1f / scale;
