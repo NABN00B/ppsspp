@@ -18,6 +18,7 @@
 #include "ppsspp_config.h"
 
 #include <algorithm>
+#include <cmath>
 #include <functional>
 
 #include "Common/Render/DrawBuffer.h"
@@ -341,8 +342,8 @@ class BouncingIconAnimation : public Animation {
 		float last_yres = 0.0f;
 		float xspeed = 1.0f;
 		float yspeed = 1.0f;
-		float scale = 0.0f;
-		float border = 0.0f;
+		float scale = 1.0f;
+		float border = 35.0f;
 		int color_ix = 0;
 		int last_color_ix = -1;
 		GMRng rng;
@@ -352,17 +353,18 @@ class BouncingIconAnimation : public Animation {
 			if (last_color_ix == -1) {
 				xbase = xres / 2.0f;
 				ybase = yres / 2.0f;
+				last_color_ix = 0;
 	
 				// Determine initial direction.
-				if ((int)(rng.F() * xbase) % 2 == 1) xspeed *= -1.0f;
-				if ((int)(rng.F() * ybase) % 2 == 1) yspeed *= -1.0f;
-				last_color_ix = 0;
+				if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
+				if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
 			}
 
 			// Scale certain attributes to resolution.
 			scale = std::min(xres, yres) / 400.0f;
-			xspeed = scale < 2.5f ? scale * 0.58f : scale * 0.35f;
-			yspeed = xspeed;
+			float speed = scale < 2.5f ? scale * 0.58f : scale * 0.46f;
+			xspeed = std::signbit(xspeed) ? speed * -1.0f : speed;
+			yspeed = std::signbit(yspeed) ? speed * -1.0f : speed;
 
 			border = 35.0f * scale;
 			last_xres = xres;
