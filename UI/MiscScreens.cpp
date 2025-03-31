@@ -310,14 +310,19 @@ class BouncingIconAnimation : public Animation {
 			dc.Flush();
 
 			// Switch direction if within border.
+			bool should_recolor = true;
 			if (xbase > xres - border || xbase < border) {
 				xspeed *= -1.0f;
 				RandomizeColor();
+				should_recolor = false;
 			}
 
 			if (ybase > yres - border || ybase < border) {
 				yspeed *= -1.0f;
-				RandomizeColor();
+
+				if (should_recolor) {
+					RandomizeColor();
+				}
 			}
 
 			// Place to border if out of bounds.
@@ -365,8 +370,8 @@ class BouncingIconAnimation : public Animation {
 			float speed = scale < 2.5f ? scale * 0.58f : scale * 0.46f;
 			xspeed = std::signbit(xspeed) ? speed * -1.0f : speed;
 			yspeed = std::signbit(yspeed) ? speed * -1.0f : speed;
-
 			border = 35.0f * scale;
+
 			last_xres = xres;
 			last_yres = yres;
 		}
