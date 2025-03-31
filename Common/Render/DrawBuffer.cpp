@@ -97,7 +97,10 @@ void DrawBuffer::V(float x, float y, float z, uint32_t color, float u, float v) 
 	vert->x = x;
 	vert->y = y;
 	vert->z = z;
-	vert->rgba = alpha_ == 1.0f ? color : alphaMul(color, alpha_);
+
+	if (color)
+		vert->rgba = alpha_ == 1.0f ? color : alphaMul(color, alpha_);
+
 	vert->u = u;
 	vert->v = v;
 }

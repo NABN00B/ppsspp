@@ -308,7 +308,7 @@ class BouncingIconAnimation : public Animation {
 					xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
 			dc.Flush();
 	
-			// Handle the bouncing.
+			// Switch direction if within border.
 			if (xbase > xres - border || xbase < border) {
 				xspeed *= -1.0f;
 				colorI = (int)(rng.F() * xres) % COLOR_COUNT;
@@ -339,9 +339,9 @@ class BouncingIconAnimation : public Animation {
 		float ybase = 0;	
 		float last_xres = 0;
 		float last_yres = 0;
-		float xspeed = 2.3f;
-		float yspeed = 2.3f;
-		float scale = 1.0f;
+		float xspeed = 0;
+		float yspeed = 0;
+		float scale = 0;
 		float border = 0;
 		int colorI = 0;
 		GMRng rng;
@@ -354,15 +354,15 @@ class BouncingIconAnimation : public Animation {
 			colorI = 0;
 	
 			// Scale certain attributes to resolution.
-			/*if (xres > yres) {
-				scale = yres / 300.0f;
-				xspeed = yres / 300.0f * 0.77f;
-				yspeed = yres / 300.0f * 0.77f;
-			} else {*/
+			if (xres > yres) {
+				scale = yres / 400.0f;
+				xspeed = yres / 400.0f * 0.58f / scale;
+				yspeed = yres / 400.0f * 0.58f / scale;
+			} else {
 				scale = xres / 400.0f;
-				xspeed = xres / 400.0f * 0.58f;
-				yspeed = xres / 400.0f * 0.58f;
-			//}
+				xspeed = xres / 400.0f * 0.58f / scale;
+				yspeed = xres / 400.0f * 0.58f / scale;
+			}
 	
 			border = 32.0f * scale;
 	
