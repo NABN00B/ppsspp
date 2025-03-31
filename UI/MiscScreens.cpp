@@ -381,7 +381,7 @@ class BouncingIconAnimation : public Animation {
 
 		void RandomizeColor() {
 			do {
-				color_ix = ((int)rng.F() * xbase) % COLOR_COUNT;
+				color_ix = (int)(rng.F() * xbase) % COLOR_COUNT;
 			} while (color_ix == last_color_ix);
 
 			last_color_ix = color_ix;
