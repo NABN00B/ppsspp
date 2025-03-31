@@ -149,8 +149,8 @@ public:
 
 			float wave0 = sin(i*0.005+t*0.8)*0.05 + sin(i*0.002+t*0.25)*0.02 + sin(i*0.001+t*0.3)*0.03 + 0.625;
 			float wave1 = sin(i*0.0044+t*0.4)*0.07 + sin(i*0.003+t*0.1)*0.02 + sin(i*0.001+t*0.3)*0.01 + 0.625;
-			dc.Draw()->RectVGradient(x, wave0*bounds.h, nextX, bounds.h, color, 0x00000000);
-			dc.Draw()->RectVGradient(x, wave1*bounds.h, nextX, bounds.h, color, 0x00000000);
+			//dc.Draw()->RectVGradient(x, wave0*bounds.h, nextX, bounds.h, color, 0x00000000);
+			//dc.Draw()->RectVGradient(x, wave1*bounds.h, nextX, bounds.h, color, 0x00000000);
 
 			// Add some "antialiasing"
 			dc.Draw()->RectVGradient(x, wave0*bounds.h-3.0f * g_display.pixel_in_dps, nextX, wave0 * bounds.h, 0x00000000, color);
@@ -305,18 +305,18 @@ class BouncingIconAnimation : public Animation {
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
 			ui_draw2d.DrawImage(System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON"),
-					xpos, ypos, scale, colors[colorI], ALIGN_CENTER);
+					xpos, ypos, scale, colors[color_ix], ALIGN_CENTER);
 			dc.Flush();
 	
 			// Switch direction if within border.
 			if (xbase > xres - border || xbase < border) {
 				xspeed *= -1.0f;
-				colorI = (int)(rng.F() * xres) % COLOR_COUNT;
+				do color_ix = (int)(rng.F() * xres) % COLOR_COUNT; while (color_ix == last_color_ix)
 			}
 	
 			if (ybase > yres - border || ybase < border) {
 				yspeed *= -1.0f;
-				colorI = (int)(rng.F() * yres) % COLOR_COUNT;
+				do color_ix = (int)(rng.F() * yres) % COLOR_COUNT; while (color_ix == last_color_ix)
 			}
 	
 			// Place to border if out of bounds.
@@ -343,7 +343,8 @@ class BouncingIconAnimation : public Animation {
 		float yspeed = 0;
 		float scale = 0;
 		float border = 0;
-		int colorI = 0;
+		int color_ix = 0;
+		int last_color_ix = 0;
 		GMRng rng;
 	
 		void Recalculate(int xres, int yres) {
@@ -371,7 +372,7 @@ class BouncingIconAnimation : public Animation {
 				yspeed = xres / 400.0f * 2.3f / scale;
 			}
 	
-			border = 32.0f * scale;
+			border = 34.0f * scale;
 		}
 };
 
