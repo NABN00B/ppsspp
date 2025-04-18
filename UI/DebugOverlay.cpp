@@ -459,12 +459,12 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 
 	if ((g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) == ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
 		// Both at the same time gets a shorter formulation.
-		w.F("%02.0f/%02.0f (%05.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
+		w.F("%2.0f/%2.0f (%5.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
 	} else {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FPS_COUNTER) {
-			w.F("%05.1f FPS", actual_fps);
+			w.F("%5.1f FPS", actual_fps);
 		} else if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::SPEED_COUNTER) {
-			w.F("%05.1f%%", vps / (59.94f / 100.0f));
+			w.F("%5.1f%%", vps / (59.94f / 100.0f));
 		}
 	}
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
@@ -475,7 +475,8 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
-	w.F("\n%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+	ctx->Flush();
+	/*w.F("\n%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 		0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
 		0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F);
 	w.F("\n%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
@@ -486,7 +487,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF);
 	w.F("\n%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 		0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7,
-		0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF);
+		0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF);*/
 	w.F("\n%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 		0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7,
 		0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF);
