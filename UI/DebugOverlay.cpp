@@ -467,16 +467,16 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		// Both at the same time gets a shorter formulation.
 		//w.F("%2.0f/%2.0f (%5.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
 		snprintf(temp, sizeof(temp), "%2.0f/%2.0f (%5.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
-		ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	} else {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FPS_COUNTER) {
 			//w.F("%4.1f FPS", actual_fps);
 			snprintf(temp, sizeof(temp), "%4.1f FPS", actual_fps);
-			ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+			ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		} else if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::SPEED_COUNTER) {
 			//w.F("%5.1f%%", vps / (59.94f / 100.0f));
 			snprintf(temp, sizeof(temp), "%5.1f%%", vps / (59.94f / 100.0f));
-			ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+			ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
@@ -485,13 +485,13 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 			// Just plain append battery. Add linebreak?
 			//w.F("%3d%%", percentage);
 			snprintf(temp, sizeof(temp), "%3d%%", percentage);
-			ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+			ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
 
-	ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, w.as_view(), bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, temp, bounds.x2() - 10, lines_drawn++ * 20 + 4, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	/*ctx->Draw()->DrawText(ubuntu24, w.as_view(), bounds.x2() - 8, 20, 0xc0000000, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawText(ubuntu24, w.as_view(), bounds.x2() - 10, 19, 0xFF3fFF3f, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);*/
