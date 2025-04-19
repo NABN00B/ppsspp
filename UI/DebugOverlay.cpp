@@ -490,10 +490,12 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[   ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|  ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|| ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[     ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|    ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[||   ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||  ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||| ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||||]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	/*ctx->Draw()->DrawText(ubuntu24, w.as_view(), bounds.x2() - 8, 20, 0xc0000000, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawText(ubuntu24, w.as_view(), bounds.x2() - 10, 19, 0xFF3fFF3f, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);*/
