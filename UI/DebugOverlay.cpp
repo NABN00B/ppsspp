@@ -454,14 +454,12 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	float vps, fps, actual_fps;
 	__DisplayGetFPS(&vps, &fps, &actual_fps);
 
-	char fpsbuf[32];
+	char fpsbuf[64];
 	StringWriter w(fpsbuf);
 
 	ctx->Flush();
 	ctx->BindFontTexture();
 	ctx->Draw()->SetFontScale(0.7f, 0.7f);
-
-	int lines_drawn = 0;
 
 	if ((g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) == ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
 		// Both at the same time gets a shorter formulation.
@@ -477,7 +475,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
-		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	}
 
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
@@ -485,17 +483,17 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 			const int battery = System_GetPropertyInt(SYSPROP_BATTERY_PERCENTAGE);
 			// Just plain append battery. Add linebreak?
 			//w.F("%3d%%", battery);
-			snprintf(fpsbuf, sizeof(fpsbuf), "%03d", battery);
-			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+			char indicator[6];
+			if      (battery > 90) { indicator = "|||||"; }
+			else if (battery > 70) { indicator = "|||| "; }
+			else if (battery > 50) { indicator = "|||  "; }
+			else if (battery > 30) { indicator = "||   "; }
+			else if (battery > 10) { indicator = "|    "; }
+			else                   { indicator = "     "; }
+			snprintf(fpsbuf, sizeof(fpsbuf), "%03d[%s]", battery, indicator);
+			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
-
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[     ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|    ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[||   ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||  ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||| ]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[|||||]"), bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	/*ctx->Draw()->DrawText(ubuntu24, w.as_view(), bounds.x2() - 8, 20, 0xc0000000, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawText(ubuntu24, w.as_view(), bounds.x2() - 10, 19, 0xFF3fFF3f, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);*/
