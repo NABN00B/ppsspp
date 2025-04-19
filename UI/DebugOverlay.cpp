@@ -454,7 +454,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	float vps, fps, actual_fps;
 	__DisplayGetFPS(&vps, &fps, &actual_fps);
 
-	char fpsbuf[64];
+	char fpsbuf[256];
 	StringWriter w(fpsbuf);
 
 	ctx->Flush();
@@ -484,12 +484,12 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 			// Just plain append battery. Add linebreak?
 			//w.F("%3d%%", battery);
 			char indicator[6];
-			if      (battery > 90) { indicator = "|||||"; }
-			else if (battery > 70) { indicator = "|||| "; }
-			else if (battery > 50) { indicator = "|||  "; }
-			else if (battery > 30) { indicator = "||   "; }
-			else if (battery > 10) { indicator = "|    "; }
-			else                   { indicator = "     "; }
+			if      (battery <= 10) { strcpy(indicator, "     "); }
+			else if (battery <= 30) { strcpy(indicator, "|    "); }
+			else if (battery <= 50) { strcpy(indicator, "||   "); }
+			else if (battery <= 70) { strcpy(indicator, "|||  "); }
+			else if (battery <= 90) { strcpy(indicator, "|||| "); }
+			else                    { strcpy(indicator, "|||||"); }
 			snprintf(fpsbuf, sizeof(fpsbuf), "%03d[%s]", battery, indicator);
 			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
