@@ -457,6 +457,8 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	char fpsbuf[256];
 	StringWriter w(fpsbuf);
 
+	int lines_drawn = 0;
+
 	ctx->Flush();
 	ctx->BindFontTexture();
 	ctx->Draw()->SetFontScale(0.7f, 0.7f);
@@ -475,7 +477,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
-		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	}
 
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
@@ -491,7 +493,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 			else if (battery <= 90) { strcpy(indicator, "|||| "); }
 			else                    { strcpy(indicator, "|||||"); }
 			snprintf(fpsbuf, sizeof(fpsbuf), "%03d[%s]", battery, indicator);
-			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
 
