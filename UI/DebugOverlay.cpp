@@ -476,7 +476,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 			snprintf(fpsbuf, sizeof(fpsbuf), "%5.1f%%", vps / (59.94f / 100.0f));
 		}
 	}
-	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER || (int)ShowStatusFlags::SPEED_COUNTER)) {
+	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
 		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	}
 
@@ -490,7 +490,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
-	std::setlocale(LC_ALL, "");
+	setlocale(LC_ALL, "");
 	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[\u2007\u2007\u2007]"), bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[#\u2007\u2007]"), bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[##\u2007]"), bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
