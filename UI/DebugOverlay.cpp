@@ -467,18 +467,19 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		// Both at the same time gets a shorter formulation.
 		//w.F("%2.0f/%2.0f (%5.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
 		snprintf(fpsbuf, sizeof(fpsbuf), "%2.0f/%2.0f (%5.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
-		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	} else {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FPS_COUNTER) {
 			//w.F("%4.1f FPS", actual_fps);
 			snprintf(fpsbuf, sizeof(fpsbuf), "%4.1f FPS", actual_fps);
-			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		} else if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::SPEED_COUNTER) {
 			//w.F("%5.1f%%", vps / (59.94f / 100.0f));
 			snprintf(fpsbuf, sizeof(fpsbuf), "%5.1f%%", vps / (59.94f / 100.0f));
-			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
+	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER || (int)ShowStatusFlags::SPEED_COUNTER)) {
+		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	}
+
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
 			const int battery = System_GetPropertyInt(SYSPROP_BATTERY_PERCENTAGE);
@@ -489,6 +490,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
+	std::setlocale(LC_ALL, "");
 	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[\u2007\u2007\u2007]"), bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[#\u2007\u2007]"), bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, strcat(fpsbuf, "[##\u2007]"), bounds.x2() - 10, lines_drawn++ * 25 + 0, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
