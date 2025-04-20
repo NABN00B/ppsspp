@@ -463,12 +463,12 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 
 	if ((g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) == ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
 		// Both at the same time gets a shorter formulation.
-		snprintf(fpsbuf, sizeof(fpsbuf), "%02.0f/%02.0f (%05.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
+		snprintf(fpsbuf, sizeof(fpsbuf), "%.0f/%02.0f (%05.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
 	} else {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FPS_COUNTER) {
-			snprintf(fpsbuf, sizeof(fpsbuf), "%04.1f FPS", actual_fps);
+			snprintf(fpsbuf, sizeof(fpsbuf), "%.1f FPS", actual_fps);
 		} else if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::SPEED_COUNTER) {
-			snprintf(fpsbuf, sizeof(fpsbuf), "%05.1f%%", vps / (59.94f / 100.0f));
+			snprintf(fpsbuf, sizeof(fpsbuf), "%.1f%%", vps / (59.94f / 100.0f));
 		}
 	}
 	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
@@ -479,16 +479,19 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
 			const int battery = System_GetPropertyInt(SYSPROP_BATTERY_PERCENTAGE);
 			char indicator[6];
-			if      (battery <= 10) { strcpy(indicator, "     "); }
-			else if (battery <= 30) { strcpy(indicator, "|    "); }
-			else if (battery <= 50) { strcpy(indicator, "||   "); }
-			else if (battery <= 70) { strcpy(indicator, "|||  "); }
-			else if (battery <= 90) { strcpy(indicator, "|||| "); }
-			else                    { strcpy(indicator, "|||||"); }
-			snprintf(fpsbuf, sizeof(fpsbuf), "%03d[%s]", battery, indicator);
+			if      (battery < 11) { strcpy(indicator, "     "); }
+			else if (battery < 31) { strcpy(indicator, "|    "); }
+			else if (battery < 51) { strcpy(indicator, "||   "); }
+			else if (battery < 71) { strcpy(indicator, "|||  "); }
+			else if (battery < 91) { strcpy(indicator, "|||| "); }
+			else                   { strcpy(indicator, "|||||"); }
+			snprintf(fpsbuf, sizeof(fpsbuf), "%d[%s]", battery, indicator);
 			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
+
+	ctx->Draw()->DrawTextShadow(ubuntu24, "\u26A1\u33C7\u32CF\u2007\u20AC\u2139\u2328", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\u20079 (\u200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	ctx->Draw()->SetFontScale(1.0f, 1.0f);
 	ctx->Flush();
