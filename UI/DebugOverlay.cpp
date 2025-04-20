@@ -490,9 +490,9 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
-	ctx->Draw()->DrawTextShadow(ubuntu24, "\x26A1\x33C7\x32CF\x2007\x20AC\x2139\x2328", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "\x2121\x2122\x2116\x33CD\x3231", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\x20079 (\x200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "\u26A1\U0001F5F2\u33C7\u32CF\u2007\u20AC\u2139\u2328", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "\u2121\u2122\u2116\u33CD\u3231", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\u20079 (\u200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	ctx->Draw()->SetFontScale(1.0f, 1.0f);
 	ctx->Flush();
