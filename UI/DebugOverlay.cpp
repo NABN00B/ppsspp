@@ -490,9 +490,57 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
+	/*
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u26A1\U0001F5F2\u33C7\u32CF\u2007\u20AC\u2139\u2328", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u2121\u2122\u2116\u33CD\u3231", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\u20079 (\u200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	*/
+
+	if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
+		// U
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0020 \u0020\u0021\u0022\u0023\u0024\u0025\u0026\u0027\u0028\u0029\u002A\u002B\u002C\u002D\u002E\u002F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0030 \u0030\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0038\u0039\u003A\u003B\u003C\u003D\u003E\u003F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0040 \u0040\u0041\u0042\u0043\u0044\u0045\u0046\u0047\u0048\u0049\u004A\u004B\u004C\u004D\u004E\u004F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0050 \u0050\u0051\u0052\u0053\u0054\u0055\u0056\u0057\u0058\u0059\u005A\u005B\u005C\u005D\u005E\u005F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0060 \u0060\u0061\u0062\u0063\u0064\u0065\u0066\u0067\u0068\u0069\u006A\u006B\u006C\u006D\u006E\u006F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0070 \u0070\u0071\u0072\u0073\u0074\u0075\u0076\u0077\u0078\u0079\u007A\u007B\u007C\u007D\u007E\u007F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+
+		// W
+		ctx->Draw()->DrawTextShadow(ubuntu24, "00A0 \u00A0\u00A1\u00A2\u00A3\u00A4\u00A5\u00A6\u00A7\u00A8\u00A9\u00AA\u00AB\u00AC\u00AD\u00AE\u00AF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "00B0 \u00B0\u00B1\u00B2\u00B3\u00B4\u00B5\u00B6\u00B7\u00B8\u00B9\u00BA\u00BB\u00BC\u00BD\u00BE\u00BF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "00C0 \u00C0\u00C1\u00C2\u00C3\u00C4\u00C5\u00C6\u00C7\u00C8\u00C9\u00CA\u00CB\u00CC\u00CD\u00CE\u00CF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "00D0 \u00D0\u00D1\u00D2\u00D3\u00D4\u00D5\u00D6\u00D7\u00D8\u00D9\u00DA\u00DB\u00DC\u00DD\u00DE\u00DF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "00E0 \u00E0\u00E1\u00E2\u00E3\u00E4\u00E5\u00E6\u00E7\u00E8\u00E9\u00EA\u00EB\u00EC\u00ED\u00EE\u00EF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "00F0 \u00F0\u00F1\u00F2\u00F3\u00F4\u00F5\u00F6\u00F7\u00F8\u00F9\u00FA\u00FB\u00FC\u00FD\u00FE\u00FF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+
+		// E
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0100 \u0100\u0101\u0102\u0103\u0104\u0105\u0106\u0107\u0108\u0109\u010A\u010B\u010C\u010D\u010E\u010F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0110 \u0110\u0111\u0112\u0113\u0114\u0115\u0116\u0117\u0118\u0119\u011A\u011B\u011C\u011D\u011E\u011F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0120 \u0120\u0121\u0122\u0123\u0124\u0125\u0126\u0127\u0128\u0129\u012A\u012B\u012C\u012D\u012E\u012F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0130 \u0130\u0131\u0132\u0133\u0134\u0135\u0136\u0137\u0138\u0139\u013A\u013B\u013C\u013D\u013E\u013F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0140 \u0140\u0141\u0142\u0143\u0144\u0145\u0146\u0147\u0148\u0149\u014A\u014B\u014C\u014D\u014E\u014F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0150 \u0150\u0151\u0152\u0153\u0154\u0155\u0156\u0157\u0158\u0159\u015A\u015B\u015C\u015D\u015E\u015F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0160 \u0160\u0161\u0162\u0163\u0164\u0165\u0166\u0167\u0168\u0169\u016A\u016B\u016C\u016D\u016E\u016F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0170 \u0170\u0171\u0172\u0173\u0174\u0175\u0176\u0177\u0178\u0179\u017A\u017B\u017C\u017D\u017E\u017F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	} else {
+		// R
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0400 \u0400\u0401\u0402\u0403\u0404\u0405\u0406\u0407\u0408\u0409\u040A\u040B\u040C\u040D\u040E\u040F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0410 \u0410\u0411\u0412\u0413\u0414\u0415\u0416\u0417\u0418\u0419\u041A\u041B\u041C\u041D\u041E\u041F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0420 \u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042A\u042B\u042C\u042D\u042E\u042F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0430 \u0430\u0431\u0432\u0433\u0434\u0435\u0436\u0437\u0438\u0439\u043A\u043B\u043C\u043D\u043E\u043F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0440 \u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044A\u044B\u044C\u044D\u044E\u044F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0450 \u0450\u0451\u0452\u0453\u0454\u0455\u0456\u0457\u0458\u0459\u045A\u045B\u045C\u045D\u045E\u045F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0460 \u0460\u0461\u0462\u0463\u0464\u0465\u0466\u0467\u0468\u0469\u046A\u046B\u046C\u046D\u046E\u046F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0470 \u0470\u0471\u0472\u0473\u0474\u0475\u0476\u0477\u0478\u0479\u047A\u047B\u047C\u047D\u047E\u047F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0480 \u0480\u0481\u0482\u0483\u0484\u0485\u0486\u0487\u0488\u0489\u048A\u048B\u048C\u048D\u048E\u048F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "0490 \u0490\u0491\u0492\u0493\u0494\u0495\u0496\u0497\u0498\u0499\u049A\u049B\u049C\u049D\u049E\u049F", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "04A0 \u04A0\u04A1\u04A2\u04A3\u04A4\u04A5\u04A6\u04A7\u04A8\u04A9\u04AA\u04AB\u04AC\u04AD\u04AE\u04AF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "04B0 \u04B0\u04B1\u04B2\u04B3\u04B4\u04B5\u04B6\u04B7\u04B8\u04B9\u04BA\u04BB\u04BC\u04BD\u04BE\u04BF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "04C0 \u04C0\u04C1\u04C2\u04C3\u04C4\u04C5\u04C6\u04C7\u04C8\u04C9\u04CA\u04CB\u04CC\u04CD\u04CE\u04CF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "04D0 \u04D0\u04D1\u04D2\u04D3\u04D4\u04D5\u04D6\u04D7\u04D8\u04D9\u04DA\u04DB\u04DC\u04DD\u04DE\u04DF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "04E0 \u04E0\u04E1\u04E2\u04E3\u04E4\u04E5\u04E6\u04E7\u04E8\u04E9\u04EA\u04EB\u04EC\u04ED\u04EE\u04EF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		ctx->Draw()->DrawTextShadow(ubuntu24, "04F0 \u04F0\u04F1\u04F2\u04F3\u04F4\u04F5\u04F6\u04F7\u04F8\u04F9\u04FA\u04FB\u04FC\u04FD\u04FE\u04FF", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	}
 
 	ctx->Draw()->SetFontScale(1.0f, 1.0f);
 	ctx->Flush();
