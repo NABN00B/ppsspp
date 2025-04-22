@@ -490,6 +490,9 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		}
 	}
 
+	snprintf(fpsbuf, sizeof(fpsbuf), "%d", __DisplayGetNumVblanks());
+	ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+
 	/*
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u26A1\U0001F5F2\u33C7\u32CF\u2007\u20AC\u2139\u2328", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u2121\u2122\u2116\u33CD\u3231", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
