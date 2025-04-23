@@ -461,6 +461,8 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FRAME_COUNTER) {
 		snprintf(fpsbuf, sizeof(fpsbuf), "%d", __DisplayGetNumVblanks());
 		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+		snprintf(fpsbuf, sizeof(fpsbuf), "%d", __DisplayGetFlipCount());
+		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	}
 
 	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
