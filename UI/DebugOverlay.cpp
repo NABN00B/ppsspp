@@ -485,6 +485,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
 		if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::BATTERY_PERCENT | (int)ShowStatusFlags::BATTERY_INDICATOR)) {
 			const int battery = System_GetPropertyInt(SYSPROP_BATTERY_PERCENTAGE);
+			fpsbuf[0] = '\0';
 
 			if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
 				snprintf(fpsbuf, sizeof(fpsbuf), "%d", battery);
@@ -510,13 +511,12 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u2121\u2122\u2116\u33CD\u3231", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\u20079 (\u200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	*/
-
-	ctx->Draw()->DrawTextShadow(ubuntu24, "  !  ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "|    ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "||   ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "|||  ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "|||| ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
-	ctx->Draw()->DrawTextShadow(ubuntu24, "|||||", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[  !  ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[|    ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[||   ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[|||  ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[|||| ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[|||||]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
 		// U
