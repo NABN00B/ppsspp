@@ -463,7 +463,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	}
 
-	int fps_flags = ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)
+	int fps_flags = ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER);
 	if(g_Config.iShowStatusFlags & fps_flags) {
 			float vps, fps, actual_fps;
 		__DisplayGetFPS(&vps, &fps, &actual_fps);
