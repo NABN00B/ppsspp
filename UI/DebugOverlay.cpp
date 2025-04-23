@@ -463,12 +463,11 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	}
 
-	int fps_flags = ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER);
-	if(g_Config.iShowStatusFlags & fps_flags) {
-			float vps, fps, actual_fps;
+	if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
+		float vps, fps, actual_fps;
 		__DisplayGetFPS(&vps, &fps, &actual_fps);
 
-		if ((g_Config.iShowStatusFlags & fps_flags) == fps_flags) {
+		if ((g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) == ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
 			// Both at the same time gets a combined formulation.
 			snprintf(fpsbuf, sizeof(fpsbuf), "%.0f/%02.0f (%05.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
 		} else {
@@ -512,6 +511,7 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\u20079 (\u200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	*/
 	ctx->Draw()->DrawTextShadow(ubuntu24, "[  !  ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "[     ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "[|    ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "[||   ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "[|||  ]", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
