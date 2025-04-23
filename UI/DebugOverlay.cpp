@@ -454,19 +454,24 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	float vps, fps, actual_fps;
 	__DisplayGetFPS(&vps, &fps, &actual_fps);
 
-	char fpsbuf[64];
+	char fpsbuf[256];
 	int lines_drawn = 0;
 
 	ctx->Flush();
 	ctx->BindFontTexture();
 	ctx->Draw()->SetFontScale(0.7f, 0.7f);
 
+	if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FRAME_COUNTER) {
+		snprintf(fpsbuf, sizeof(fpsbuf), "%d", __DisplayGetNumVblanks());
+		ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	}
+
 	if ((g_Config.iShowStatusFlags & ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) == ((int)ShowStatusFlags::FPS_COUNTER | (int)ShowStatusFlags::SPEED_COUNTER)) {
-		// Both at the same time gets a shorter formulation.
+		// Both at the same time gets a combined formulation.
 		snprintf(fpsbuf, sizeof(fpsbuf), "%.0f/%02.0f (%05.1f%%)", actual_fps, fps, vps / ((g_Config.iDisplayRefreshRate / 60.0f * 59.94f) / 100.0f));
 	} else {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::FPS_COUNTER) {
-			snprintf(fpsbuf, sizeof(fpsbuf), "%.1f FPS", actual_fps);
+			snprintf(fpsbuf, sizeof(fpsbuf), "%.0f FPS", actual_fps);
 		} else if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::SPEED_COUNTER) {
 			snprintf(fpsbuf, sizeof(fpsbuf), "%.1f%%", vps / (59.94f / 100.0f));
 		}
@@ -478,26 +483,37 @@ void DrawFPS(UIContext *ctx, const Bounds &bounds) {
 	if (System_GetPropertyBool(SYSPROP_CAN_READ_BATTERY_PERCENTAGE)) {
 		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
 			const int battery = System_GetPropertyInt(SYSPROP_BATTERY_PERCENTAGE);
-			char indicator[6];
+			snprintf(fpsbuf, sizeof(fpsbuf), "%d", battery);
+		}
+
+		if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_INDICATOR) {
+			char indicator[32];
 			if      (battery < 11) { strcpy(indicator, "     "); }
 			else if (battery < 31) { strcpy(indicator, "|    "); }
 			else if (battery < 51) { strcpy(indicator, "||   "); }
 			else if (battery < 71) { strcpy(indicator, "|||  "); }
 			else if (battery < 91) { strcpy(indicator, "|||| "); }
 			else                   { strcpy(indicator, "|||||"); }
-			snprintf(fpsbuf, sizeof(fpsbuf), "%d[%s]", battery, indicator);
+			snprintf(fpsbuf + strlen(fpsbuf), sizeof(fpsbuf) - strlen(fpsbuf) - 1, " [%s]", indicator);
+		}
+
+		if(g_Config.iShowStatusFlags & ((int)ShowStatusFlags::BATTERY_PERCENT | (int)ShowStatusFlags::BATTERY_INDICATOR)) {
 			ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 		}
 	}
-
-	snprintf(fpsbuf, sizeof(fpsbuf), "%d", __DisplayGetNumVblanks());
-	ctx->Draw()->DrawTextShadow(ubuntu24, fpsbuf, bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	/*
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u26A1\U0001F5F2\u33C7\u32CF\u2007\u20AC\u2139\u2328", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "\u2121\u2122\u2116\u33CD\u3231", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	ctx->Draw()->DrawTextShadow(ubuntu24, "30/\u20079 (\u200798.7%)", bounds.x2() - 20, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 	*/
+
+	ctx->Draw()->DrawTextShadow(ubuntu24, "  !  ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "|    ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "||   ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "|||  ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "|||| ", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
+	ctx->Draw()->DrawTextShadow(ubuntu24, "|||||", bounds.x2() - 100, lines_drawn++ * 26 + 10, 0xFF3FFF3F, ALIGN_TOPRIGHT | FLAG_DYNAMIC_ASCII);
 
 	if (g_Config.iShowStatusFlags & (int)ShowStatusFlags::BATTERY_PERCENT) {
 		// U

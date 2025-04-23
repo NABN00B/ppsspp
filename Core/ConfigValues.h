@@ -181,6 +181,8 @@ enum class ShowStatusFlags {
 	FPS_COUNTER = 1 << 1,
 	SPEED_COUNTER = 1 << 2,
 	BATTERY_PERCENT = 1 << 3,
+	BATTERY_INDICATOR = 1 << 4,
+	FRAME_COUNTER = 1 << 5,
 };
 
 enum class DumpFileType {
