@@ -1594,9 +1594,9 @@ void Slider::Draw(UIContext &dc) {
 	uint32_t knobColor;
 	// Popup bg can be vastly different from itemStyle bg, so we need to ensure it looks good in both cases.
 	if (down_) {
-		knobColor = popupStyle_ ? dc.theme->itemDownStyle.background : dc.theme->itemDownStyle.fgColor;
+		knobColor = popupStyle_ ? dc.theme->itemDownStyle.background.color : dc.theme->itemDownStyle.fgColor;
 	} else if (focus) {
-		knobColor = popupStyle_ ? dc.theme->itemFocusedStyle.background : dc.theme->itemFocusedStyle.fgColor;
+		knobColor = popupStyle_ ? dc.theme->itemFocusedStyle.background.color : dc.theme->itemFocusedStyle.fgColor;
 	} else {
 		knobColor = lineColor;
 	}
@@ -1755,9 +1755,9 @@ void SliderFloat::Draw(UIContext &dc) {
 	uint32_t knobColor;
 	// Popup bg can be vastly different from itemStyle bg, so we need to ensure it looks good in both cases.
 	if (down_) {
-		knobColor = popupStyle_ ? dc.theme->itemDownStyle.background : dc.theme->itemDownStyle.fgColor;
+		knobColor = popupStyle_ ? dc.theme->itemDownStyle.background.color : dc.theme->itemDownStyle.fgColor;
 	} else if (focus) {
-		knobColor = popupStyle_ ? dc.theme->itemFocusedStyle.background : dc.theme->itemFocusedStyle.fgColor;
+		knobColor = popupStyle_ ? dc.theme->itemFocusedStyle.background.color : dc.theme->itemFocusedStyle.fgColor;
 	} else {
 		knobColor = lineColor;
 	}
