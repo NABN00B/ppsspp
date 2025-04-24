@@ -1590,20 +1590,28 @@ void Slider::Clamp() {
 
 void Slider::Draw(UIContext &dc) {
 	bool focus = HasFocus();
-	uint32_t linecolor = dc.theme->itemStyle.fgColor;
-	Style knobStyle = (down_ || focus) ? dc.theme->itemStyle : dc.theme->popupStyle;
+	uint32_t lineColor = popupStyle_ ? dc.theme->popupStyle.fgColor : dc.theme->itemStyle.fgColor;
+	uint32_t knobColor;
+	// Popup bg can be vastly different from itemStyle bg, so we need to ensure it looks good in both cases.
+	if (down_) {
+		knobColor = popupStyle_ ? dc.theme->itemDownStyle.background : dc.theme->itemDownStyle.fgColor;
+	} else if (focus) {
+		knobColor = popupStyle_ ? dc.theme->itemFocusedStyle.background : dc.theme->itemFocusedStyle.fgColor;
+	} else {
+		knobColor = lineColor;
+	}
 
 	float knobX = ((float)(*value_) - minValue_) / (maxValue_ - minValue_) * (bounds_.w - paddingLeft_ - paddingRight_) + (bounds_.x + paddingLeft_);
-	dc.FillRect(Drawable(linecolor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
+	dc.FillRect(Drawable(lineColor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
 	dc.FillRect(Drawable(0xFF808080), Bounds(knobX, bounds_.centerY() - 2, (bounds_.x + bounds_.w - paddingRight_ - knobX), 4));
-	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, knobStyle.fgColor, ALIGN_CENTER);
+	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, knobColor, ALIGN_CENTER);
 	char temp[64];
 	if (showPercent_)
 		snprintf(temp, sizeof(temp), "%d%%", *value_);
 	else
 		snprintf(temp, sizeof(temp), "%d", *value_);
 	dc.SetFontStyle(dc.theme->uiFont);
-	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), dc.theme->popupStyle.fgColor, ALIGN_CENTER | FLAG_DYNAMIC_ASCII);
+	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), knobColor, ALIGN_CENTER | FLAG_DYNAMIC_ASCII);
 }
 
 std::string Slider::DescribeText() const {
@@ -1743,17 +1751,25 @@ void SliderFloat::Clamp() {
 
 void SliderFloat::Draw(UIContext &dc) {
 	bool focus = HasFocus();
-	uint32_t linecolor = dc.theme->itemStyle.fgColor;
-	Style knobStyle = (down_ || focus) ? dc.theme->itemStyle : dc.theme->popupStyle;
+	uint32_t lineColor = popupStyle_ ? dc.theme->popupStyle.fgColor : dc.theme->itemStyle.fgColor;
+	uint32_t knobColor;
+	// Popup bg can be vastly different from itemStyle bg, so we need to ensure it looks good in both cases.
+	if (down_) {
+		knobColor = popupStyle_ ? dc.theme->itemDownStyle.background : dc.theme->itemDownStyle.fgColor;
+	} else if (focus) {
+		knobColor = popupStyle_ ? dc.theme->itemFocusedStyle.background : dc.theme->itemFocusedStyle.fgColor;
+	} else {
+		knobColor = lineColor;
+	}
 
 	float knobX = (*value_ - minValue_) / (maxValue_ - minValue_) * (bounds_.w - paddingLeft_ - paddingRight_) + (bounds_.x + paddingLeft_);
-	dc.FillRect(Drawable(linecolor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
+	dc.FillRect(Drawable(lineColor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
 	dc.FillRect(Drawable(0xFF808080), Bounds(knobX, bounds_.centerY() - 2, (bounds_.x + bounds_.w - paddingRight_ - knobX), 4));
-	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, knobStyle.fgColor, ALIGN_CENTER);
+	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, knobColor, ALIGN_CENTER);
 	char temp[64];
 	snprintf(temp, sizeof(temp), "%0.2f", *value_);
 	dc.SetFontStyle(dc.theme->uiFont);
-	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), dc.theme->popupStyle.fgColor, ALIGN_CENTER);
+	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), knobColor, ALIGN_CENTER);
 }
 
 std::string SliderFloat::DescribeText() const {
