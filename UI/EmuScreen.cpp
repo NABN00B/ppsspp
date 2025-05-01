@@ -1504,7 +1504,7 @@ ScreenRenderRole EmuScreen::renderRole(bool isTop) const {
 void EmuScreen::darken() {
 	if (!screenManager()->topScreen()->wantBrightBackground()) {
 		UIContext &dc = *screenManager()->getUIContext();
-		uint32_t color = GetBackgroundColorWithAlpha(dc);
+		uint32_t color = dc.theme->backgroundColor;
 		dc.Begin();
 		dc.RebindTexture();
 		dc.FillRect(UI::Drawable(color), dc.GetBounds());

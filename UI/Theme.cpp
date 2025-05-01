@@ -57,7 +57,7 @@ struct ThemeInfo {
 	uint32_t uTooltipStyleBg = 0xC0303030;
 	uint32_t uCollapsibleHeaderStyleFg = 0xFFFFFFFF;
 	uint32_t uCollapsibleHeaderStyleBg = 0x55000000;
-	uint32_t uBackgroundColor = 0xFF754D24;
+	uint32_t uBackgroundColor = 0xA6754D24;
 	uint32_t uScrollbarColor = 0x80FFFFFF;
 
 	std::string sUIAtlas = "ui_atlas";
