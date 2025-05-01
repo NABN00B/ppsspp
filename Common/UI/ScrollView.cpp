@@ -250,7 +250,7 @@ void ScrollView::Draw(UIContext &dc) {
 
 	if (bob.show) {
 		uint32_t color = dc.GetTheme().scrollbarColor;
-		if (input.flags & TOUCH_DOWN) {
+		if (draggingBob_) {
 			color | 0xFF000000;
 		}
 
