@@ -251,7 +251,7 @@ void ScrollView::Draw(UIContext &dc) {
 	if (bob.show) {
 		uint32_t color = dc.GetTheme().scrollbarColor;
 		if (draggingBob_) {
-			color | 0xFF000000;
+			color |= 0xFF000000;
 		}
 
 		Bounds bobBounds(bounds_.x2() - bob.thickness, bounds_.y + bob.offset, bob.thickness, bob.size);
