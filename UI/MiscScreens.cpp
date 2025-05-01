@@ -453,7 +453,7 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 		// I_BG original color: 0xFF754D24
 		ImageID img = ImageID("I_BG");
 		dc.Begin();
-		dc.Draw()->DrawImageStretch(img, dc.GetBounds(), bgColor & dc.theme->backgroundColor);
+		dc.Draw()->DrawImageStretch(img, dc.GetBounds(), bgColor & dc.theme->backgroundColor | 0xFF000000);
 		dc.Flush();
 	}
 
@@ -473,7 +473,7 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 }
 
 uint32_t GetBackgroundColorWithAlpha(const UIContext &dc) {
-	return colorAlpha(colorBlend(dc.GetTheme().backgroundColor, 0, 0.5f), 0.65f);  // 0.65 = 166 = A6
+	return colorBlend(dc.GetTheme().backgroundColor, 0, 0.5f);
 }
 
 void DrawGameBackground(UIContext &dc, const Path &gamePath, float x, float y, float z) {
