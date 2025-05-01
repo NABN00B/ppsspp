@@ -473,7 +473,7 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 }
 
 uint32_t GetBackgroundColorWithAlpha(const UIContext &dc) {
-	return colorAlpha(colorBlend(dc.GetTheme().backgroundColor, 0, 0.5f), 0.65f);  // 0.65 = 166 = A6
+	return colorBlend(dc.GetTheme().backgroundColor, 0, 0.5f);
 }
 
 void DrawGameBackground(UIContext &dc, const Path &gamePath, float x, float y, float z) {
