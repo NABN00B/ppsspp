@@ -1590,28 +1590,27 @@ void Slider::Clamp() {
 
 void Slider::Draw(UIContext &dc) {
 	bool focus = HasFocus();
-	uint32_t lineColor = popupStyle_ ? dc.theme->popupSliderColor : dc.theme->itemStyle.fgColor;
-	uint32_t knobColor;
-	// Popup bg can be vastly different from itemStyle bg, so we need to ensure it looks good in both cases.
+	uint32_t sliderColor;
+
 	if (down_) {
-		knobColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemDownStyle.fgColor;
+		sliderColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemDownStyle.fgColor;
 	} else if (focus) {
-		knobColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemFocusedStyle.fgColor;
+		sliderColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemFocusedStyle.fgColor;
 	} else {
-		knobColor = lineColor;
+		sliderColor = popupStyle_ ? dc.theme->popupSliderColor : dc.theme->itemStyle.fgColor;
 	}
 
 	float knobX = ((float)(*value_) - minValue_) / (maxValue_ - minValue_) * (bounds_.w - paddingLeft_ - paddingRight_) + (bounds_.x + paddingLeft_);
-	dc.FillRect(Drawable(knobColor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
+	dc.FillRect(Drawable(sliderColor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
 	dc.FillRect(Drawable(0xFF808080), Bounds(knobX, bounds_.centerY() - 2, (bounds_.x + bounds_.w - paddingRight_ - knobX), 4));
-	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, knobColor, ALIGN_CENTER);
+	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, sliderColor, ALIGN_CENTER);
 	char temp[64];
 	if (showPercent_)
 		snprintf(temp, sizeof(temp), "%d%%", *value_);
 	else
 		snprintf(temp, sizeof(temp), "%d", *value_);
 	dc.SetFontStyle(dc.theme->uiFont);
-	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), knobColor, ALIGN_CENTER | FLAG_DYNAMIC_ASCII);
+	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), sliderColor, ALIGN_CENTER | FLAG_DYNAMIC_ASCII);
 }
 
 std::string Slider::DescribeText() const {
@@ -1751,25 +1750,24 @@ void SliderFloat::Clamp() {
 
 void SliderFloat::Draw(UIContext &dc) {
 	bool focus = HasFocus();
-	uint32_t lineColor = popupStyle_ ? dc.theme->popupSliderColor : dc.theme->itemStyle.fgColor;
-	uint32_t knobColor;
-	// Popup bg can be vastly different from itemStyle bg, so we need to ensure it looks good in both cases.
+	uint32_t sliderColor;
+
 	if (down_) {
-		knobColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemDownStyle.fgColor;
+		sliderColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemDownStyle.fgColor;
 	} else if (focus) {
-		knobColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemFocusedStyle.fgColor;
+		sliderColor = popupStyle_ ? dc.theme->popupSliderFocusedColor : dc.theme->itemFocusedStyle.fgColor;
 	} else {
-		knobColor = lineColor;
+		sliderColor = popupStyle_ ? dc.theme->popupSliderColor : dc.theme->itemStyle.fgColor;
 	}
 
 	float knobX = (*value_ - minValue_) / (maxValue_ - minValue_) * (bounds_.w - paddingLeft_ - paddingRight_) + (bounds_.x + paddingLeft_);
-	dc.FillRect(Drawable(knobColor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
+	dc.FillRect(Drawable(sliderColor), Bounds(bounds_.x + paddingLeft_, bounds_.centerY() - 2, knobX - (bounds_.x + paddingLeft_), 4));
 	dc.FillRect(Drawable(0xFF808080), Bounds(knobX, bounds_.centerY() - 2, (bounds_.x + bounds_.w - paddingRight_ - knobX), 4));
-	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, knobColor, ALIGN_CENTER);
+	dc.Draw()->DrawImage(dc.theme->sliderKnob, knobX, bounds_.centerY(), 1.0f, sliderColor, ALIGN_CENTER);
 	char temp[64];
 	snprintf(temp, sizeof(temp), "%0.2f", *value_);
 	dc.SetFontStyle(dc.theme->uiFont);
-	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), knobColor, ALIGN_CENTER);
+	dc.DrawText(temp, bounds_.x2() - 22, bounds_.centerY(), sliderColor, ALIGN_CENTER);
 }
 
 std::string SliderFloat::DescribeText() const {
