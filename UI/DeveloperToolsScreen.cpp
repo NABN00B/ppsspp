@@ -76,6 +76,7 @@ static std::string PostShaderTranslateName(std::string_view value) {
 void DeveloperToolsScreen::CreateTextureReplacementTab(UI::LinearLayout *list) {
 	using namespace UI;
 	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
+	auto di = GetI18NCategory(I18NCat::DIALOG);
 
 	list->Add(new ItemHeader(dev->T("Texture Replacement")));
 	list->Add(new CheckBox(&g_Config.bSaveNewTextures, dev->T("Save new textures")));
@@ -95,6 +96,26 @@ void DeveloperToolsScreen::CreateTextureReplacementTab(UI::LinearLayout *list) {
 		}
 		return true;
 	});
+
+	if (System_GetPropertyBool(SYSPROP_CAN_SHOW_FILE)) {
+		// Best string we have
+		list->Add(new Choice(di->T("Show in folder")))->OnClick.Add([=](UI::EventParams &) {
+			Path path;
+			if (PSP_IsInited()) {
+				std::string gameID = g_paramSFO.GetDiscID();
+				path = GetSysDirectory(DIRECTORY_TEXTURES) / gameID;
+			} else {
+				// Just show the root textures directory.
+				path = GetSysDirectory(DIRECTORY_TEXTURES);
+			}
+			System_ShowFileInFolder(path);
+			return UI::EVENT_DONE;
+		});
+	}
+
+	static const char *texLoadSpeeds[] = { "Slow (smooth)", "Medium", "Fast", "Instant (may stutter)" };
+	PopupMultiChoice *texLoadSpeed = list->Add(new PopupMultiChoice(&g_Config.iReplacementTextureLoadSpeed, dev->T("Replacement texture load speed"), texLoadSpeeds, 0, ARRAY_SIZE(texLoadSpeeds), I18NCat::DEVELOPER, screenManager()));
+	texLoadSpeed->SetChoiceIcon(3, ImageID("I_WARNING"));
 }
 
 void DeveloperToolsScreen::CreateGeneralTab(UI::LinearLayout *list) {
@@ -297,6 +318,14 @@ void DeveloperToolsScreen::CreateAudioTab(UI::LinearLayout *list) {
 	list->Add(new CheckBox(&g_Config.bForceFfmpegForAudioDec, dev->T("Use FFMPEG for all compressed audio")));
 }
 
+void DeveloperToolsScreen::CreateNetworkTab(UI::LinearLayout *list) {
+	using namespace UI;
+	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
+	auto ms = GetI18NCategory(I18NCat::MAINSETTINGS);
+	list->Add(new ItemHeader(ms->T("Networking")));
+	list->Add(new CheckBox(&g_Config.bDontDownloadInfraJson, dev->T("Don't download infra-dns.json")));
+}
+
 void DeveloperToolsScreen::CreateGraphicsTab(UI::LinearLayout *list) {
 	using namespace UI;
 	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
@@ -419,6 +448,9 @@ void DeveloperToolsScreen::CreateTabs() {
 	});
 	AddTab("Graphics", ms->T("Graphics"), [this](UI::LinearLayout *parent) {
 		CreateGraphicsTab(parent);
+	});
+	AddTab("Networking", ms->T("Networking"), [this](UI::LinearLayout *parent) {
+		CreateNetworkTab(parent);
 	});
 	AddTab("Audio", ms->T("Audio"), [this](UI::LinearLayout *parent) {
 		CreateAudioTab(parent);
