@@ -149,13 +149,6 @@ public:
 	}
 };
 
-const ImageID FloatingSymbolsAnimation::SYMBOLS[4] = {
-	ImageID("I_CROSS"),
-	ImageID("I_CIRCLE"),
-	ImageID("I_SQUARE"),
-	ImageID("I_TRIANGLE"),
-};
-
 class FloatingSymbolsAnimation : public Animation {
 public:
 	FloatingSymbolsAnimation(bool is_colored) : FloatingSymbolsAnimation() {
@@ -203,6 +196,13 @@ private:
 		last_xres = xres;
 		last_yres = yres;
 	}
+};
+
+const ImageID FloatingSymbolsAnimation::SYMBOLS[4] = {
+	ImageID("I_CROSS"),
+	ImageID("I_CIRCLE"),
+	ImageID("I_SQUARE"),
+	ImageID("I_TRIANGLE"),
 };
 
 class RecentGamesAnimation : public Animation {
