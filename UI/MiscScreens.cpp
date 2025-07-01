@@ -169,7 +169,7 @@ public:
 			float y = ybase[i] + dc.GetBounds().y + 40 * cosf(i * 7.2f + t * 1.3f);
 			float angle = (float)sin(i + t);
 			int n = i & 3;
-			Color color = is_colored ? colorAlpha(COLORS[n], alpha * 0.25f) : colorAlpha(DEFAULT_COLOR, alpha * 0.15f);
+			Color color = is_colored ? colorAlpha(COLORS[n], alpha * 0.25f) : colorAlpha(DEFAULT_COLOR, alpha * 0.1f);
 			ui_draw2d.DrawImageRotated(SYMBOLS[n], x, y, 1.0f, angle, color);
 		}
 		dc.Flush();
@@ -179,7 +179,6 @@ private:
 	static constexpr int COUNT = 100;
 	static constexpr Color DEFAULT_COLOR = 0xC0FFFFFF;
 	static constexpr Color COLORS[4] = { 0xFFE3B56F, 0xFF615BFF, 0xFFAA88F3, 0xFFC2CC7A, }; // X O D A
-	// static constexpr Color COLORS[4] = { 0xFFD6AA94, 0xFF5656AA, 0xFF9E6BED, 0xFF629F00, }; // X O D A
 	static const ImageID SYMBOLS[4];
 
 	bool is_colored = false;
