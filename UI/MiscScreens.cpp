@@ -149,6 +149,13 @@ public:
 	}
 };
 
+const ImageID FloatingSymbolsAnimation::SYMBOLS[4] = {
+	ImageID("I_CROSS"),
+	ImageID("I_CIRCLE"),
+	ImageID("I_SQUARE"),
+	ImageID("I_TRIANGLE"),
+};
+
 class FloatingSymbolsAnimation : public Animation {
 public:
 	FloatingSymbolsAnimation(bool is_colored) : FloatingSymbolsAnimation() {
@@ -177,14 +184,8 @@ public:
 private:
 	static constexpr int COUNT = 100;
 	static constexpr Color DEFAULT_COLOR = 0xC0FFFFFF;
-	static constexpr Color COLORS[4] = { 0xFFD6AA94, 0xFF5656AA, 0xFF9E6BED, 0xFF629F00, };
-
-	static const ImageID SYMBOLS[4] = {
-		ImageID("I_CROSS"),
-		ImageID("I_CIRCLE"),
-		ImageID("I_SQUARE"),
-		ImageID("I_TRIANGLE"),
-	};
+	static constexpr Color COLORS[4] = { 0xFFD6AA94, 0xFF5656AA, 0xFF9E6BED, 0xFF629F00, }; // X O D A
+	static const ImageID SYMBOLS[4];
 
 	bool is_colored = false;
 	float xbase[COUNT]{};
