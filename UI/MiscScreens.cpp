@@ -64,20 +64,6 @@
 #pragma execution_character_set("utf-8")
 #endif
 
-static const ImageID symbols[4] = {
-	ImageID("I_CROSS"),
-	ImageID("I_CIRCLE"),
-	ImageID("I_SQUARE"),
-	ImageID("I_TRIANGLE"),
-};
-
-static const uint32_t colors[4] = {
-	0xC0FFFFFF,
-	0xC0FFFFFF,
-	0xC0FFFFFF,
-	0xC0FFFFFF,
-};
-
 static Draw::Texture *bgTexture;
 
 class Animation {
@@ -165,6 +151,10 @@ public:
 
 class FloatingSymbolsAnimation : public Animation {
 public:
+	FloatingSymbolsAnimation(bool is_colored) : FloatingSymbolsAnimation() {
+		this->is_colored = is_colored;
+	}
+
 	void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
 		dc.Flush();
 		dc.Begin();
@@ -179,14 +169,24 @@ public:
 			float y = ybase[i] + dc.GetBounds().y + 40 * cosf(i * 7.2f + t * 1.3f);
 			float angle = (float)sin(i + t);
 			int n = i & 3;
-			ui_draw2d.DrawImageRotated(symbols[n], x, y, 1.0f, angle, colorAlpha(colors[n], alpha * 0.1f));
+			ui_draw2d.DrawImageRotated(SYMBOLS[n], x, y, 1.0f, angle, colorAlpha(is_colored ? COLORS[n] : DEFAULT_COLOR, alpha * 0.1f));
 		}
 		dc.Flush();
 	}
 
 private:
 	static constexpr int COUNT = 100;
+	static constexpr Color DEFAULT_COLOR = 0xC0FFFFFF;
+	static constexpr Color COLORS[4] = { 0xFFD6AA94, 0xFF5656AA, 0xFF9E6BED, 0xFF629F00, };
 
+	static constexpr ImageID SYMBOLS[4] = {
+		ImageID("I_CROSS"),
+		ImageID("I_CIRCLE"),
+		ImageID("I_SQUARE"),
+		ImageID("I_TRIANGLE"),
+	};
+
+	bool is_colored = false;
 	float xbase[COUNT]{};
 	float ybase[COUNT]{};
 	float last_xres = 0;
@@ -306,7 +306,7 @@ class BouncingIconAnimation : public Animation {
 			float xpos = xbase + dc.GetBounds().x;
 			float ypos = ybase + dc.GetBounds().y;
 			ImageID icon = !color_ix && System_GetPropertyBool(SYSPROP_APP_GOLD) ? ImageID("I_ICONGOLD") : ImageID("I_ICON");
-			ui_draw2d.DrawImage(icon, xpos, ypos, scale, colors[color_ix], ALIGN_CENTER);
+			ui_draw2d.DrawImage(icon, xpos, ypos, scale, COLORS[color_ix], ALIGN_CENTER);
 			dc.Flush();
 
 			// Switch direction if within border.
@@ -338,7 +338,7 @@ class BouncingIconAnimation : public Animation {
 
 	private:
 		static constexpr int COLOR_COUNT = 11;
-		static constexpr Color colors[COLOR_COUNT] = { 0xFFFFFFFF, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF,
+		static constexpr Color COLORS[COLOR_COUNT] = { 0xFFFFFFFF, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF,
 				0xFF00FFFF, 0xFFFF00FF, 0xFF4111D1, 0xFF3577F3, 0xFFAA77FF, 0xFF623B84 };
 
 		float xbase = 0.0f;
@@ -433,6 +433,9 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 			break;
 		case BackgroundAnimation::BOUNCING_ICON:
 			g_Animation.reset(new BouncingIconAnimation());
+			break;
+		case BackgroundAnimation::FLOATING_SYMBOLS_COLORED:
+			g_Animation.reset(new FloatingSymbolsAnimation(true));
 			break;
 		default:
 			g_Animation.reset(nullptr);
