@@ -151,7 +151,7 @@ public:
 
 class FloatingSymbolsAnimation : public Animation {
 public:
-	FloatingSymbolsAnimation(bool is_colored) : FloatingSymbolsAnimation() {
+	FloatingSymbolsAnimation(bool is_colored) {
 		this->is_colored = is_colored;
 	}
 
@@ -421,7 +421,7 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 
 		switch (g_CurBackgroundAnimation) {
 		case BackgroundAnimation::FLOATING_SYMBOLS:
-			g_Animation.reset(new FloatingSymbolsAnimation());
+			g_Animation.reset(new FloatingSymbolsAnimation(false));
 			break;
 		case BackgroundAnimation::RECENT_GAMES:
 			g_Animation.reset(new RecentGamesAnimation());
