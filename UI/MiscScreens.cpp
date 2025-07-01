@@ -169,7 +169,7 @@ public:
 			float y = ybase[i] + dc.GetBounds().y + 40 * cosf(i * 7.2f + t * 1.3f);
 			float angle = (float)sin(i + t);
 			int n = i & 3;
-			Color color = is_colored ? colorAlpha(COLORS[n], alpha * 0.3f) : colorAlpha(DEFAULT_COLOR, alpha * 0.1f);
+			Color color = is_colored ? colorAlpha(COLORS[n], alpha * 0.2f) : colorAlpha(DEFAULT_COLOR, alpha * 0.1f);
 			ui_draw2d.DrawImageRotated(SYMBOLS[n], x, y, 1.0f, angle, color);
 		}
 		dc.Flush();
