@@ -72,13 +72,6 @@ public:
 	virtual void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) = 0;
 };
 
-static constexpr float XFAC = 0.3f;
-static constexpr float YFAC = 0.3f;
-static constexpr float ZFAC = 0.12f;
-static constexpr float XSPEED = 0.05f;
-static constexpr float YSPEED = 0.05f;
-static constexpr float ZSPEED = 0.1f;
-
 class MovingBackground : public Animation {
 public:
 	void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
@@ -109,6 +102,13 @@ public:
 	}
 
 private:
+	static constexpr float XFAC = 0.3f;
+	static constexpr float YFAC = 0.3f;
+	static constexpr float ZFAC = 0.12f;
+	static constexpr float XSPEED = 0.05f;
+	static constexpr float YSPEED = 0.05f;
+	static constexpr float ZSPEED = 0.1f;
+
 	float lastX_ = 0.0f;
 	float lastY_ = 0.0f;
 	float lastZ_ = 1.0f + std::max(XFAC, YFAC);
@@ -179,7 +179,7 @@ private:
 	static constexpr Color DEFAULT_COLOR = 0xC0FFFFFF;
 	static constexpr Color COLORS[4] = { 0xFFD6AA94, 0xFF5656AA, 0xFF9E6BED, 0xFF629F00, };
 
-	static constexpr ImageID SYMBOLS[4] = {
+	static const ImageID SYMBOLS[4] = {
 		ImageID("I_CROSS"),
 		ImageID("I_CIRCLE"),
 		ImageID("I_SQUARE"),
