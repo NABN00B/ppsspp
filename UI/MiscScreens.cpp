@@ -151,6 +151,10 @@ public:
 
 class FloatingSymbolsAnimation : public Animation {
 public:
+	FloatingSymbolsAnimation(bool is_colored) {
+		this->is_colored = is_colored;
+	}
+
 	void Draw(UIContext &dc, double t, float alpha, float x, float y, float z) override {
 		dc.Flush();
 		dc.Begin();
@@ -419,7 +423,7 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 
 		switch (g_CurBackgroundAnimation) {
 		case BackgroundAnimation::FLOATING_SYMBOLS:
-			g_Animation.reset(new FloatingSymbolsAnimation());
+			g_Animation.reset(new FloatingSymbolsAnimation(false));
 			break;
 		case BackgroundAnimation::RECENT_GAMES:
 			g_Animation.reset(new RecentGamesAnimation());
@@ -434,7 +438,7 @@ void DrawBackground(UIContext &dc, float alpha, float x, float y, float z) {
 			g_Animation.reset(new BouncingIconAnimation());
 			break;
 		case BackgroundAnimation::FLOATING_SYMBOLS_COLORED:
-			g_Animation.reset(new FloatingSymbolsAnimation{ is_colored = true; });
+			g_Animation.reset(new FloatingSymbolsAnimation(true));
 			break;
 		default:
 			g_Animation.reset(nullptr);
