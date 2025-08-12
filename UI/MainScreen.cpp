@@ -258,7 +258,7 @@ void GameButton::Draw(UIContext &dc) {
 		// Adjust position so we don't stretch the image vertically or horizontally.
 		// Make sure it's not wider than 144 (like Doom Legacy homebrew), ugly in the grid mode.
 		float nw = std::min(h * tw / th, (float)w);
-		x += (w - nw) / 2.0f;
+		x += w / 2.0f;
 		w = nw;
 	}
 
@@ -379,9 +379,9 @@ void GameButton::Draw(UIContext &dc) {
 		const AtlasImage *gearImage = dc.Draw()->GetAtlas()->getImage(ImageID("I_GEAR"));
 		if (gearImage) {
 			if (gridStyle_) {
-				dc.Draw()->DrawImage(ImageID("I_GEAR"), x, y + h - gearImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
+				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x, y + h - gearImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(ImageID("I_GEAR"), x - gearImage->w, y, 1.0f);
+				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x - gearImage->w, y, 1.0f);
 			}
 		}
 	}
@@ -398,10 +398,10 @@ void GameButton::Draw(UIContext &dc) {
 		const AtlasImage *image = dc.Draw()->GetAtlas()->getImage(regionIcons[regionIndex]);
 		if (image) {
 			if (gridStyle_) {
-				dc.Draw()->DrawImage(regionIcons[regionIndex], x + w - (image->w + 5)*g_Config.fGameGridScale,
+				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + bounds_.w - (image->w + 5)*g_Config.fGameGridScale,
 							y + h - (image->h + 5)*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(regionIcons[regionIndex], x - 2 - image->w - 3, y + h - image->h - 5, 1.0f);
+				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x - image->w - 5, y + h - image->h - 5, 1.0f);
 			}
 		}
 	}
