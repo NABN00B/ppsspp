@@ -258,7 +258,7 @@ void GameButton::Draw(UIContext &dc) {
 		// Adjust position so we don't stretch the image vertically or horizontally.
 		// Make sure it's not wider than 144 (like Doom Legacy homebrew), ugly in the grid mode.
 		float nw = std::min(h * tw / th, (float)w);
-		x += w / 2.0f;
+		x += (w - nw) / 2.0f;
 		w = nw;
 	}
 
@@ -375,16 +375,18 @@ void GameButton::Draw(UIContext &dc) {
 	} else {
 		dc.Draw()->Flush();
 	}
+
 	if (ginfo->hasConfig && !ginfo->id.empty()) {
 		const AtlasImage *gearImage = dc.Draw()->GetAtlas()->getImage(ImageID("I_GEAR"));
 		if (gearImage) {
 			if (gridStyle_) {
 				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x, y + h - gearImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x - gearImage->w, y, 1.0f);
+				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x + 4, y, 1.0f);
 			}
 		}
 	}
+
 	const int regionIndex = (int)ginfo->region;
 	if (g_Config.bShowRegionOnGameIcon && regionIndex >= 0 && regionIndex < (int)GameRegion::COUNT) {
 		const ImageID regionIcons[(int)GameRegion::COUNT] = {
@@ -401,19 +403,22 @@ void GameButton::Draw(UIContext &dc) {
 				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + bounds_.w - (image->w + 5)*g_Config.fGameGridScale,
 							y + h - (image->h + 5)*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x - image->w - 5, y + h - image->h - 5, 1.0f);
+				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + 4, y + h - image->h - 5, 1.0f);
 			}
 		}
 	}
+
 	if (gridStyle_ && g_Config.bShowIDOnGameIcon) {
 		dc.SetFontScale(0.5f*g_Config.fGameGridScale, 0.5f*g_Config.fGameGridScale);
-		dc.DrawText(ginfo->id_version, x+5, y+1, 0xFF000000, ALIGN_TOPLEFT);
-		dc.DrawText(ginfo->id_version, x+4, y, dc.theme->infoStyle.fgColor, ALIGN_TOPLEFT);
+		// dc.DrawText(ginfo->id_version, x+5, y+1, 0xFF000000, ALIGN_TOPLEFT);
+		dc.DrawTextShadow(ginfo->id_version, bounds_.x + 4, y, dc.theme->infoStyle.fgColor, ALIGN_TOPLEFT);
 		dc.SetFontScale(1.0f, 1.0f);
 	}
+
 	if (overlayColor) {
 		dc.FillRect(Drawable(overlayColor), overlayBounds);
 	}
+
 	dc.RebindTexture();
 }
 
