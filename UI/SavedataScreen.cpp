@@ -757,7 +757,7 @@ void GameIconView::Draw(UIContext &dc) {
 	// Adjust size so we don't stretch the image vertically or horizontally.
 	// Make sure it's not wider than 144 (like Doom Legacy homebrew), ugly in the grid mode.
 	float nw = std::min(bounds_.h * textureWidth_ / textureHeight_, (float)bounds_.w);
-	int x = bounds_.x + (w - nw) / 2.0f;
+	int x = bounds_.x + (bounds_.w - nw) / 2.0f;
 
 	dc.Flush();
 	dc.GetDrawContext()->BindTexture(0, texture);
