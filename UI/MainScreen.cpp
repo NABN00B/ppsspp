@@ -382,7 +382,7 @@ void GameButton::Draw(UIContext &dc) {
 			if (gridStyle_) {
 				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x, y + h - gearImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x + 4, y, 1.0f);
+				dc.Draw()->DrawImage(ImageID("I_GEAR"), bounds_.x - 1, y, 1.0f);
 			}
 		}
 	}
@@ -410,8 +410,8 @@ void GameButton::Draw(UIContext &dc) {
 
 	if (gridStyle_ && g_Config.bShowIDOnGameIcon) {
 		dc.SetFontScale(0.5f*g_Config.fGameGridScale, 0.5f*g_Config.fGameGridScale);
-		// dc.DrawText(ginfo->id_version, x+5, y+1, 0xFF000000, ALIGN_TOPLEFT);
-		dc.DrawTextShadow(ginfo->id_version, bounds_.x + 4, y, dc.theme->infoStyle.fgColor, ALIGN_TOPLEFT);
+		dc.DrawText(ginfo->id_version, bounds_.x+5, y+1, 0xFF000000, ALIGN_TOPLEFT);
+		dc.DrawText(ginfo->id_version, bounds_.x+4, y, dc.theme->infoStyle.fgColor, ALIGN_TOPLEFT);
 		dc.SetFontScale(1.0f, 1.0f);
 	}
 
