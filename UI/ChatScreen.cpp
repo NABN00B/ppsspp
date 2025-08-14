@@ -227,10 +227,14 @@ void ChatMenu::ApplyVisibility(bool isVisible) {
 		chatEdit_->SetVisibility(UI::V_GONE);
 		scroll_->SetVisibility(UI::V_GONE);
 		box_->SetVisibility(UI::V_GONE);
-		chatVert_->SetVisibility(UI::V_VISIBLE);
+		//chatVert_->SetVisibility(UI::V_VISIBLE);
+		SetVisibility(UI::V_VISIBLE);
 		return;
 	}
 
+	chatEdit_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
+	scroll_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
+	box_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
 	SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
 }
 
