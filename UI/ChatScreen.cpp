@@ -226,16 +226,16 @@ void ChatMenu::ApplyVisibility(bool isVisible) {
 	if (&g_Config.bAlwaysShowChatScreen && !isVisible) {
 		chatEdit_->SetVisibility(UI::V_INVISIBLE);
 		scroll_->SetVisibility(UI::V_INVISIBLE);
-		box_->SetVisibility(UI::V_INVISIBLE);
+		//box_->SetVisibility(UI::V_INVISIBLE);
 		chatVert_->SetVisibility(UI::V_VISIBLE);
 		SetVisibility(UI::V_VISIBLE);
 		return;
 	}
 
-	chatEdit_->SetVisibility(UI::V_VISIBLE);
-	//scroll_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
-	//box_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
-	SetVisibility(UI::V_VISIBLE);
+	chatEdit_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_INVISIBLE);
+	scroll_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_INVISIBLE);
+	box_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_INVISIBLE);
+	SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_INVISIBLE);
 }
 
 void ChatMenu::Close() {
