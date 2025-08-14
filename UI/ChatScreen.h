@@ -12,6 +12,7 @@ public:
 	void Update() override;
 	bool SubviewFocused(UI::View *view) override;
 
+	void ApplyVisibility(bool isVisible);
 	void Close();
 
 	bool Contains(float x, float y) const {

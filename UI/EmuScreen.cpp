@@ -1292,7 +1292,7 @@ void EmuScreen::CreateViews() {
 			chatButton_ = btn;
 		}
 		chatMenu_ = root_->Add(new ChatMenu(GetRequesterToken(), screenManager()->getUIContext()->GetBounds(), screenManager(), new LayoutParams(FILL_PARENT, FILL_PARENT)));
-		chatMenu_->SetVisibility(UI::V_GONE);
+		chatMenu_->ApplyVisibility(false);
 	}
 
 	saveStatePreview_ = new AsyncImageFileView(Path(), IS_FIXED, new AnchorLayoutParams(bounds.centerX(), 100, NONE, NONE, true));
@@ -1375,7 +1375,7 @@ UI::EventReturn EmuScreen::OnChat(UI::EventParams &params) {
 		chatButton_->SetVisibility(UI::V_GONE);
 	}
 	if (chatMenu_ != nullptr) {
-		chatMenu_->SetVisibility(UI::V_VISIBLE);
+		chatMenu_->ApplyVisibility(true);
 
 #if PPSSPP_PLATFORM(WINDOWS) || defined(USING_QT_UI) || defined(SDL)
 		UI::EnableFocusMovement(true);
