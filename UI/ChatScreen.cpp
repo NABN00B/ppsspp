@@ -233,11 +233,11 @@ void ChatMenu::ApplyVisibility(bool isVisible) {
 	}
 
 	chatEdit_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
-	scroll_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
-	box_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
+	//scroll_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
+	//box_->SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
 	SetVisibility(isVisible ? UI::V_VISIBLE : UI::V_GONE);
 }
 
 void ChatMenu::Close() {
-	SetVisibility(UI::V_GONE);
+	ApplyVisibility(false);
 }
