@@ -223,10 +223,10 @@ bool ChatMenu::SubviewFocused(UI::View *view) {
 }
 
 void ChatMenu::ApplyVisibility(bool isVisible) {
-	if (&g_Config.bAlwaysShowChatScreen && !isVisible) {
+	if (g_Config.bAlwaysShowChatScreen && !isVisible) {
 		chatEdit_->SetVisibility(UI::V_INVISIBLE);
 		scroll_->SetVisibility(UI::V_INVISIBLE);
-		//box_->SetVisibility(UI::V_INVISIBLE);
+		box_->SetVisibility(UI::V_INVISIBLE);
 		chatVert_->SetVisibility(UI::V_VISIBLE);
 		SetVisibility(UI::V_VISIBLE);
 		return;
