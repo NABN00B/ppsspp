@@ -379,6 +379,10 @@ GameRegion DetectGameRegionFromID(std::string_view id_full) {
 			case 'K': return GameRegion::KOREA; break;
 			case 'A': return GameRegion::ASIA; break;
 			case 'H': return GameRegion::HONGKONG; break;
+			case 'I':
+				if (id_release_type == "NP")
+					return GameRegion::INTERNAL;
+				// fall-through
 			default:  return GameRegion::HOMEBREW;
 			}
 			// The fourth letter is not very useful to us.
@@ -396,9 +400,7 @@ GameRegion DetectGameRegionFromID(std::string_view id_full) {
 			//   'T' -> Test / Pre-production
 			//   'X' -> Experimental / Pre-production?
 		} // Misc patterns
-		else if (id_letters == "NPIA") {
-			return GameRegion::INTERNAL;
-		} else if (id_letters == "UTST") {
+		else if (id_letters == "UTST") {
 			return GameRegion::TEST;
 		} else if (id_letters == "UMDT") {
 			return GameRegion::DIAGNOSTIC;
