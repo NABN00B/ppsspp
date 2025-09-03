@@ -359,7 +359,7 @@ std::string ParamSFOData::GenerateFakeID(const Path &filename) const {
 }
 
 GameRegion DetectGameRegionFromID(std::string_view id_full) {
-	// DISC_ID format is 4 letters followed by 5 numbers.
+	// DISC_ID format consists of a 4-letter categorization followed by a 5-digit catalog number.
 	if (id_full.size() == 9 || (id_full.size() == 10 && id_full[4] == '-')) {
 		std::string_view id_letters = id_full.substr(0, 4);
 		std::string_view id_release_type = id_letters.substr(0, 2);
@@ -379,11 +379,7 @@ GameRegion DetectGameRegionFromID(std::string_view id_full) {
 			case 'K': return GameRegion::KOREA; break;
 			case 'A': return GameRegion::ASIA; break;
 			case 'H': return GameRegion::HONGKONG; break;
-			case 'I':
-				if (id_release_type == "NP")
-					return GameRegion::INTERNAL;
-				// fall-through
-			default:  return GameRegion::HOMEBREW;
+			default:  return id_letters == "NPIA" ? GameRegion::INTERNAL : GameRegion::HOMEBREW ;
 			}
 			// The fourth letter could be used to determine the type of product. It isn't useful to us.
 			// Guesswork of what they could possibly mean:
