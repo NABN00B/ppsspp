@@ -1323,10 +1323,10 @@ void TouchTestScreen::CreateViews() {
 #endif
 
 #if PPSSPP_PLATFORM(ANDROID)
-	theTwo->Add(new Choice(gr->T("Recreate Activity")))->OnClick.Handle(this, &TouchTestScreen::OnRecreateActivity);
+	root_->Add(new Choice(gr->T("Recreate Activity")))->OnClick.Handle(this, &TouchTestScreen::OnRecreateActivity);
 #endif
-	theTwo->Add(new CheckBox(&g_Config.bImmersiveMode, gr->T("FullScreen", "Full Screen")))->OnClick.Handle(this, &TouchTestScreen::OnImmersiveModeChange);
-	theTwo->Add(new Choice(di->T("Back")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
+	root_->Add(new CheckBox(&g_Config.bImmersiveMode, gr->T("FullScreen", "Full Screen")))->OnClick.Handle(this, &TouchTestScreen::OnImmersiveModeChange);
+	root_->Add(new Choice(di->T("Back"), new LayoutParams(FILL_PARENT, WRAP_CONTENT, Margins(10, 0)))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
 }
 
 void TouchTestScreen::UpdateLogView() {
