@@ -1174,7 +1174,7 @@ void FrameDumpTestScreen::CreateViews() {
 	TabHolder *tabHolder;
 	tabHolder = new TabHolder(ORIENT_VERTICAL, 200, nullptr, new AnchorLayoutParams(10, 0, 10, 0, false));
 	root_->Add(tabHolder);
-	tabHolder_->AddBack(this);
+	tabHolder->AddBack(this);
 	tabHolder->SetTag("DumpTypes");
 	root_->SetDefaultFocusView(tabHolder);
 
