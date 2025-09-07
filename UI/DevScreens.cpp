@@ -1174,7 +1174,7 @@ void FrameDumpTestScreen::CreateViews() {
 	TabHolder *tabHolder;
 	tabHolder = new TabHolder(ORIENT_VERTICAL, 200, nullptr, new AnchorLayoutParams(10, 0, 10, 0, false));
 	root_->Add(tabHolder);
-	AddStandardBack(root_);
+	tabHolder_->AddBack(this);
 	tabHolder->SetTag("DumpTypes");
 	root_->SetDefaultFocusView(tabHolder);
 
@@ -1323,10 +1323,10 @@ void TouchTestScreen::CreateViews() {
 #endif
 
 #if PPSSPP_PLATFORM(ANDROID)
-	root_->Add(new Choice(gr->T("Recreate Activity")))->OnClick.Handle(this, &TouchTestScreen::OnRecreateActivity);
+	theTwo->Add(new Choice(gr->T("Recreate Activity")))->OnClick.Handle(this, &TouchTestScreen::OnRecreateActivity);
 #endif
-	root_->Add(new CheckBox(&g_Config.bImmersiveMode, gr->T("FullScreen", "Full Screen")))->OnClick.Handle(this, &TouchTestScreen::OnImmersiveModeChange);
-	root_->Add(new Choice(di->T("Back")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
+	theTwo->Add(new CheckBox(&g_Config.bImmersiveMode, gr->T("FullScreen", "Full Screen")))->OnClick.Handle(this, &TouchTestScreen::OnImmersiveModeChange);
+	theTwo->Add(new Choice(di->T("Back")))->OnClick.Handle<UIScreen>(this, &UIScreen::OnBack);
 }
 
 void TouchTestScreen::UpdateLogView() {

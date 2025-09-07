@@ -576,7 +576,7 @@ void AnalogSetupScreen::CreateViews() {
 	auto co = GetI18NCategory(I18NCat::CONTROLS);
 	ScrollView *scroll = leftColumn->Add(new ScrollView(ORIENT_VERTICAL, new LinearLayoutParams(1.0)));
 
-	LinearLayout *scrollContents = scroll->Add(new LinearLayout(ORIENT_VERTICAL, new LinearLayoutParams(300.0f, WRAP_CONTENT)));
+	LinearLayout *scrollContents = scroll->Add(new LinearLayout(ORIENT_VERTICAL, new LinearLayoutParams(310.0f, WRAP_CONTENT)));
 
 	scrollContents->Add(new ItemHeader(co->T("Analog Settings", "Analog Settings")));
 
