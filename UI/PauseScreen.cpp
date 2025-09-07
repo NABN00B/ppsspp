@@ -373,7 +373,7 @@ void GamePauseScreen::CreateSavestateControls(UI::LinearLayout *leftColumnItems,
 
 	leftColumnItems->SetSpacing(10.0);
 	for (int i = 0; i < NUM_SAVESLOTS; i++) {
-		SaveSlotView *slot = leftColumnItems->Add(new SaveSlotView(gamePath_, i, vertical, new LayoutParams(FILL_PARENT, WRAP_CONTENT)));
+		SaveSlotView *slot = leftColumnItems->Add(new SaveSlotView(gamePath_, i, vertical), new LayoutParams(FILL_PARENT, WRAP_CONTENT));
 		slot->OnStateLoaded.Handle(this, &GamePauseScreen::OnState);
 		slot->OnStateSaved.Handle(this, &GamePauseScreen::OnState);
 		slot->OnScreenshotClicked.Handle(this, &GamePauseScreen::OnScreenshotClicked);
