@@ -506,7 +506,7 @@ void DirButton::Draw(UIContext &dc) {
 		if (pinned_ && gridStyle_) {
 			const AtlasImage *pinImg = dc.Draw()->GetAtlas()->getImage(ImageID("I_PIN"));
 			dc.Draw()->DrawImage(pinImg, bounds_.x + bounds_.w - (pinImg->w + 5)*g_Config.fGameGridScale,
-						y + h - (pinImg->h + 5)*g_Config.fGameGridScale, 0.5f*g_Config.fGameGridScale);
+						bounds_.y + bounds_.h - (pinImg->h + 5)*g_Config.fGameGridScale, 0.5f*g_Config.fGameGridScale);
 		}
 
 		if (scissor) {
