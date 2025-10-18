@@ -504,8 +504,9 @@ void DirButton::Draw(UIContext &dc) {
 		dc.DrawText(text, bounds_.x + 150, bounds_.centerY(), style.fgColor, ALIGN_VCENTER | FLAG_WRAP_TEXT);
 
 		if (pinned_ && gridStyle_) {
-			dc.Draw()->DrawImage(ImageID("I_PIN"), bounds_.x + bounds_.w - (image->w + 5)*g_Config.fGameGridScale,
-						y + h - (image->h + 5)*g_Config.fGameGridScale, 0.5f*g_Config.fGameGridScale);
+			ImageID pinImg = ImageID("I_PIN");
+			dc.Draw()->DrawImage(pinImg, bounds_.x + bounds_.w - (pinImg.w + 5)*g_Config.fGameGridScale,
+						y + h - (pinImg.h + 5)*g_Config.fGameGridScale, 0.5f*g_Config.fGameGridScale);
 		}
 
 		if (scissor) {
