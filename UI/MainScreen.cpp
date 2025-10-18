@@ -388,8 +388,8 @@ void GameButton::Draw(UIContext &dc) {
 	}
 
 	const int regionIndex = (int)ginfo->region;
-	if (g_Config.bShowRegionOnGameIcon && regionIndex >= 0 && regionIndex < (int)GameRegion::COUNT) {
-		const ImageID regionIcons[(int)GameRegion::COUNT] = {
+	if (g_Config.bShowRegionOnGameIcon && regionIndex >= 0 && regionIndex < (int)GameRegion::FLAG_COUNT) {
+		const ImageID regionIcons[(int)GameRegion::FLAG_COUNT] = {
 			ImageID("I_FLAG_JP"),
 			ImageID("I_FLAG_US"),
 			ImageID("I_FLAG_EU"),
