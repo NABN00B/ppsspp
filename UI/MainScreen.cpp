@@ -324,7 +324,7 @@ void GameButton::Draw(UIContext &dc) {
 		dc.PushScissor(bounds_);
 		const std::string currentTitle = ginfo->GetTitle();
 		dc.SetFontScale(0.6f * g_Config.fGameGridScale, 0.6f * g_Config.fGameGridScale);
-		dc.DrawText(title_, bounds_.x + 4.0f, bounds_.centerY(), style.fgColor, ALIGN_VCENTER | ALIGN_LEFT | FLAG_ELLIPSIZE_TEXT);
+		dc.DrawText(title_, bounds_.x + 4.0f, bounds_.centerY(), style.fgColor, ALIGN_VCENTER | ALIGN_HCENTER);
 		dc.SetFontScale(1.0f, 1.0f);
 		title_ = currentTitle;
 		dc.Draw()->Flush();
@@ -368,7 +368,7 @@ void GameButton::Draw(UIContext &dc) {
 	} else if (!texture) {
 		dc.Draw()->Flush();
 		dc.PushScissor(bounds_);
-		dc.DrawText(title_, bounds_.x + 4, bounds_.centerY(), style.fgColor, ALIGN_VCENTER | FLAG_WRAP_TEXT);
+		dc.DrawText(title_, bounds_.x + 4, bounds_.centerY(), style.fgColor, ALIGN_VCENTER);
 		dc.Draw()->Flush();
 		dc.PopScissor();
 	} else {
@@ -386,21 +386,16 @@ void GameButton::Draw(UIContext &dc) {
 		}
 	}
 
-	int regionIndex = (int)ginfo->region;
-	if (g_Config.bShowRegionOnGameIcon && regionIndex >= 0) {
-		const ImageID regionIcons[(int)GameRegion::FLAG_COUNT] = {
+	const int regionIndex = (int)ginfo->region;
+	if (g_Config.bShowRegionOnGameIcon && regionIndex >= 0 && regionIndex < (int)GameRegion::COUNT) {
+		const ImageID regionIcons[(int)GameRegion::COUNT] = {
 			ImageID("I_FLAG_JP"),
 			ImageID("I_FLAG_US"),
 			ImageID("I_FLAG_EU"),
 			ImageID("I_FLAG_HK"),
 			ImageID("I_FLAG_AS"),
 			ImageID("I_FLAG_KO"),
-			ImageID("I_FLAG_HB"),
-			ImageID("I_FLAG_ZZ"),
 		};
-		if (regionIndex >= (int)GameRegion::FLAG_COUNT) {
-			regionIndex = (int)GameRegion::FLAG_COUNT - 1;
-		}
 		const AtlasImage *image = dc.Draw()->GetAtlas()->getImage(regionIcons[regionIndex]);
 		if (image) {
 			if (gridStyle_) {
@@ -481,7 +476,6 @@ void DirButton::Draw(UIContext &dc) {
 
 	float tw, th;
 	dc.MeasureText(dc.GetFontStyle(), gridStyle_ ? g_Config.fGameGridScale : 1.0, gridStyle_ ? g_Config.fGameGridScale : 1.0, text, &tw, &th, 0);
-	int textAlignment = ALIGN_VCENTER;
 
 	bool compact = bounds_.w < 180 * (gridStyle_ ? g_Config.fGameGridScale : 1.0);
 
@@ -491,14 +485,12 @@ void DirButton::Draw(UIContext &dc) {
 	if (compact) {
 		// No folder icon, except "up"
 		dc.PushScissor(bounds_);
-		textAlignment |= ALIGN_HCENTER;
 		if (image == ImageID("I_FOLDER") || image == ImageID("I_FOLDER_PINNED")) {
-			dc.DrawText(text, bounds_.x + 5, bounds_.centerY(), style.fgColor, textAlignment);
+			dc.DrawText(text, bounds_.x + 5, bounds_.centerY(), style.fgColor, ALIGN_VCENTER);
 			if (pinned_) {
 				ImageID pinID = ImageID("I_PIN");
 				const AtlasImage *pinImg = dc.Draw()->GetAtlas()->getImage(pinID);
-				dc.Draw()->DrawImage(pinID, bounds_.x + bounds_.w - pinImg->w * 0.5f *g_Config.fGameGridScale,
-							bounds_.y + bounds_.h - pinImg->h * 0.5f * g_Config.fGameGridScale, 0.5f * g_Config.fGameGridScale);
+				dc.Draw()->DrawImage(pinID, bounds_.x + bounds_.w - pinImg->w * g_Config.fGameGridScale, bounds_.y, g_Config.fGameGridScale);
 			}
 		} else {
 			dc.Draw()->DrawImage(image, bounds_.centerX(), bounds_.centerY(), gridStyle_ ? g_Config.fGameGridScale : 1.0, style.fgColor, ALIGN_CENTER);
@@ -511,7 +503,7 @@ void DirButton::Draw(UIContext &dc) {
 			scissor = true;
 		}
 		dc.Draw()->DrawImage(image, bounds_.x + 72, bounds_.centerY(), 0.88f*(gridStyle_ ? g_Config.fGameGridScale : 1.0), style.fgColor, ALIGN_CENTER);
-		dc.DrawText(text, bounds_.x + 150, bounds_.centerY(), style.fgColor, textAlignment);
+		dc.DrawText(text, bounds_.x + 150, bounds_.centerY(), style.fgColor, ALIGN_VCENTER);
 
 		if (scissor) {
 			dc.PopScissor();
