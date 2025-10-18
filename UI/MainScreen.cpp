@@ -400,7 +400,7 @@ void GameButton::Draw(UIContext &dc) {
 			ImageID("I_FLAG_ZZ"),
 		};
 		if (regionIndex >= (int)GameRegion::FLAG_COUNT) {
-			regionIndex = (int)GameRegion::FLAG_COUNT - 1;
+			regionIndex = (int)(GameRegion::FLAG_COUNT - 1);
 		}
 		const AtlasImage *image = dc.Draw()->GetAtlas()->getImage(regionIcons[regionIndex]);
 		if (image) {
