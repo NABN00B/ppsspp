@@ -320,11 +320,11 @@ void GameButton::Draw(UIContext &dc) {
 	dc.RebindTexture();
 	dc.SetFontStyle(dc.GetTheme().uiFont);
 	if (gridStyle_ && ginfo->fileType == IdentifiedFileType::PPSSPP_GE_DUMP) {
-		// Super simple drawing for ge dumps.
+		// Super simple drawing for GE dumps.
 		dc.PushScissor(bounds_);
 		const std::string currentTitle = ginfo->GetTitle();
 		dc.SetFontScale(0.6f * g_Config.fGameGridScale, 0.6f * g_Config.fGameGridScale);
-		dc.DrawText(title_, bounds_.x + 4.0f, bounds_.centerY(), style.fgColor, ALIGN_VCENTER | ALIGN_HCENTER);
+		dc.DrawText(title_, bounds_.x + 4.0f, bounds_.centerY(), style.fgColor, ALIGN_VCENTER | ALIGN_LEFT);
 		dc.SetFontScale(1.0f, 1.0f);
 		title_ = currentTitle;
 		dc.Draw()->Flush();
@@ -925,8 +925,6 @@ void GameBrowser::Refresh() {
 			pinnedDir->OnClick.Handle(this, &GameBrowser::NavigateClick);
 			pinnedDir->SetPinned(true);
 		}
-
-		// Add a separator?
 	}
 
 	if (listingPending_) {
