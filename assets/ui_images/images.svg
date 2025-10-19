@@ -5041,40 +5041,21 @@
     <g
        id="I_CHAT">
       <path
-         id="rect1"
          style="opacity:1;fill:#ffffff;stroke-width:0.470766;stroke-miterlimit:100;paint-order:stroke fill markers"
          d="m 63.169271,82.550001 c -0.860024,0 -2.315104,0.903864 -2.315104,1.653645 v 3.307292 c 0,0.749781 1.45508,1.653646 2.315104,1.653646 h 2.315105 v 2.645833 l 2.315104,-2.645833 c 0.860024,0 2.315104,-0.903865 2.315104,-1.653646 v -3.307292 c 0,-0.749781 -1.45508,-1.653645 -2.315104,-1.653645 z m 0.264584,0.79375 h 4.101041 c 0.663447,0 1.785938,0.614628 1.785938,1.124479 v 2.778125 c 0,0.509851 -1.122491,1.124479 -1.785938,1.124479 h -4.101041 c -0.663447,0 -1.785938,-0.614628 -1.785938,-1.124479 V 84.46823 c 0,-0.509851 1.122491,-1.124479 1.785938,-1.124479 z"
          sodipodi:nodetypes="sssscccsssssssssssss" />
       <g
-         id="I_THREE_DOTS-9"
          transform="matrix(0,0.42098793,-0.42098793,0,184.2034,-18.462937)"
-         inkscape:export-xdpi="135"
-         inkscape:export-ydpi="135"
-         inkscape:label="dots">
+         inkscape:label="chat-dots">
         <path
-           inkscape:export-ydpi="135"
-           inkscape:export-xdpi="135"
-           inkscape:export-filename="C:\dev\ppsspp\source_assets\image\cross.png"
-           inkscape:connector-curvature="0"
-           id="path1341-5"
            d="m 246.85591,278.30491 h 2.51392 v -2.51393 l -2.51393,1e-5 z"
            style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.537317"
            sodipodi:nodetypes="ccccc" />
         <path
            sodipodi:nodetypes="ccccc"
            style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.537317"
-           d="m 246.85591,283.16061 2.51392,-1e-5 v -2.51392 h -2.51393 z"
-           id="path1343-4"
-           inkscape:connector-curvature="0"
-           inkscape:export-filename="C:\dev\ppsspp\source_assets\image\cross.png"
-           inkscape:export-xdpi="135"
-           inkscape:export-ydpi="135" />
+           d="m 246.85591,283.16061 2.51392,-1e-5 v -2.51392 h -2.51393 z" />
         <path
-           inkscape:export-ydpi="135"
-           inkscape:export-xdpi="135"
-           inkscape:export-filename="C:\dev\ppsspp\source_assets\image\cross.png"
-           inkscape:connector-curvature="0"
-           id="path1345-3"
            d="m 246.85591,287.9716 h 2.51392 v -2.51393 l -2.51393,10e-6 z"
            style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.537317"
            sodipodi:nodetypes="ccccc" />
@@ -5083,97 +5064,59 @@
     <g
        id="I_DEBUGGER">
       <path
-         id="I_UNCHECKEDBOX-4"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none"
-         inkscape:label="window"
          d="m 72.760417,82.550001 v 9.260416 h 9.260417 v -9.260416 z m 0.79375,0.529166 h 4.233334 v 0.727604 h -4.233334 z m 0,1.322917 h 7.672917 v 6.614583 h -7.672917 z" />
       <path
-         id="I_RECORD-7"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:label="circle"
          d="m 77.456771,85.658855 a 1.984375,2.3812499 0 0 0 -1.984375,2.38125 1.984375,2.3812499 0 0 0 1.984375,2.38125 1.984375,2.3812499 0 0 0 1.984375,-2.38125 1.984375,2.3812499 0 0 0 -1.984375,-2.38125 z m 0,0.79375 a 1.190625,1.5875 0 0 1 1.190625,1.5875 1.190625,1.5875 0 0 1 -1.190625,1.5875 1.190625,1.5875 0 0 1 -1.190625,-1.5875 1.190625,1.5875 0 0 1 1.190625,-1.5875 z" />
       <rect
          y="87.77552"
          x="78.779686"
          height="0.5291667"
          width="1.5875"
-         id="I_STOP-6"
-         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:export-xdpi="133.41901"
-         inkscape:export-ydpi="133.41901"
-         inkscape:label="rect" />
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none" />
       <rect
          y="87.77552"
          x="74.546356"
          height="0.5291667"
          width="1.5875"
-         id="I_STOP-6-6"
-         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:export-xdpi="133.41901"
-         inkscape:export-ydpi="133.41901"
-         inkscape:label="rect" />
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none" />
       <path
-         id="I_STOP-6-6-6-0"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:label="rect"
          d="m 78.515105,89.164584 v 0.529167 h 1.277441 l 0.508496,0.881083 0.45837,-0.264583 -0.661458,-1.145667 z"
          sodipodi:nodetypes="ccccccc" />
       <path
-         id="I_STOP-6-6-6-0-3"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:label="rect"
          d="m 76.459933,89.164584 v 0.529167 h -1.277441 l -0.508496,0.881083 -0.45837,-0.264583 0.661458,-1.145667 z"
          sodipodi:nodetypes="ccccccc" />
       <path
-         id="I_STOP-6-6-6-0-0"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:label="rect"
          d="M 78.515105,86.870667 V 86.3415 h 1.277441 l 0.508496,-0.881083 0.45837,0.264583 -0.661458,1.145667 z"
          sodipodi:nodetypes="ccccccc" />
       <path
-         id="I_STOP-6-6-6-0-3-7"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:label="rect"
          d="M 76.459933,86.870667 V 86.3415 h -1.277441 l -0.508496,-0.881083 -0.45837,0.264583 0.661458,1.145667 z"
          sodipodi:nodetypes="ccccccc" />
       <path
-         id="I_RECORD-7-5"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none"
-         inkscape:label="circle"
          d="m 77.456771,85.195834 a 0.79374999,0.79374999 0 0 0 -0.79375,0.79375 0.79374999,0.79374999 0 0 0 0.292489,0.613916 1.190625,1.5875 0 0 1 0.501261,-0.150895 1.190625,1.5875 0 0 1 0.503329,0.149345 0.79374999,0.79374999 0 0 0 0.290421,-0.612366 0.79374999,0.79374999 0 0 0 -0.79375,-0.79375 z" />
     </g>
     <g
        id="I_DEVMENU"
        transform="matrix(0.65373915,0,0,1.1128176,69.864854,1.4389211)">
       <path
-         inkscape:export-ydpi="135"
-         inkscape:export-xdpi="135"
-         inkscape:export-filename="C:\dev\ppsspp\source_assets\image\square.png"
-         inkscape:connector-curvature="0"
-         id="path1205-1"
          d="m 33.569297,74.195706 v 1.188799 h 8.094462 v -1.188799 z"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none"
          sodipodi:nodetypes="ccccc" />
       <path
-         inkscape:export-ydpi="135"
-         inkscape:export-xdpi="135"
-         inkscape:export-filename="C:\dev\ppsspp\source_assets\image\square.png"
-         inkscape:connector-curvature="0"
-         id="path6-6"
          d="m 33.569297,76.330667 v 1.188799 h 8.094462 v -1.188799 z"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none"
          sodipodi:nodetypes="ccccc" />
       <path
-         inkscape:export-ydpi="135"
-         inkscape:export-xdpi="135"
-         inkscape:export-filename="C:\dev\ppsspp\source_assets\image\square.png"
-         inkscape:connector-curvature="0"
-         id="path7-5"
          d="m 33.569297,78.465628 v 1.188799 h 8.094462 v -1.188799 z"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none"
          sodipodi:nodetypes="ccccc" />
       <path
-         id="path1205-1-2"
          style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none"
          d="m 28.307896,72.888027 c -0.314691,0 0.191212,0.08037 0.371063,0.23776 0.179853,0.157389 0.43838,0.391794 0.43838,0.951039 v 2.377599 H 27.49845 v 0.713279 l 0.404723,0.83216 -0.404723,0.653839 v 1.842639 c 0.334904,0.592625 1.236975,0.71328 2.023616,0.71328 0.78664,0 1.611913,-0.17115 2.023615,-0.71328 v -1.842639 l -0.404723,-0.653839 0.404723,-0.83216 v -0.713279 h -1.618892 v -2.377599 c 0,-0.559216 0.258516,-0.793643 0.438364,-0.951039 0.179848,-0.157396 0.685751,-0.23776 0.371082,-0.23776 z m 0.404723,4.279677 h 1.618893 l -0.404723,0.83216 0.404723,0.653839 v 1.12936 c 0,0.578769 -0.32303,0.713279 -0.809446,0.713279 -0.486417,0 -0.809447,-0.13451 -0.809447,-0.713279 v -1.12936 l 0.404723,-0.653839 z"
          sodipodi:nodetypes="sssccccccaccccccssssccccszsccc" />
