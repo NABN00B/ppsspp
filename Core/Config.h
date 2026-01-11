@@ -510,9 +510,10 @@ public:
 	bool bWlanPowerSave;
 	bool bEnableNetworkChat;
 	bool bDontDownloadInfraJson;
+
 	int iChatButtonPosition;
 	int iChatScreenPosition;
-
+	bool bAlwaysShowChatScreen;
 	bool bEnableQuickChat;
 	std::string sQuickChat0;
 	std::string sQuickChat1;
