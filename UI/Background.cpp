@@ -276,19 +276,19 @@ public:
 		dc.Flush();
 
 		// Switch direction if within border.
-		bool should_recolor = true;
+		bool should_recolor = false;
 		if (xbase > xres - border || xbase < border) {
 			xspeed *= -1.0f;
-			RandomizeColor();
-			should_recolor = false;
+			should_recolor = true;
 		}
 
 		if (ybase > yres - border || ybase < border) {
 			yspeed *= -1.0f;
+			should_recolor = true;
+		}
 
-			if (should_recolor) {
-				RandomizeColor();
-			}
+		if (should_recolor) {
+			RandomizeColor();
 		}
 
 		// Place to border if out of bounds.
@@ -327,8 +327,9 @@ private:
 			last_color_ix = 0;
 
 			// Determine initial direction.
-			if ((int)(rng.F() * xres) % 2) xspeed *= -1.0f;
-			if ((int)(rng.F() * yres) % 2) yspeed *= -1.0f;
+			rng.Init(time_now_d() * 100239);
+			if (rng.R32() % 2) xspeed *= -1.0f;
+			if (rng.R32() % 2) yspeed *= -1.0f;
 		}
 
 		// Scale certain attributes to resolution.
@@ -344,7 +345,7 @@ private:
 
 	void RandomizeColor() {
 		do {
-			color_ix = (int)(rng.F() * xbase) % COLOR_COUNT;
+			color_ix = rng.R32() % COLOR_COUNT;
 		} while (color_ix == last_color_ix);
 
 		last_color_ix = color_ix;
