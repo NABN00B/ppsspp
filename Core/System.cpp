@@ -228,11 +228,14 @@ static void GetBootError(IdentifiedFileType type, std::string *errorString) {
 		break;
 
 	case IdentifiedFileType::ARCHIVE_7Z: *errorString = "7z file detected (Require 7-Zip)"; break;
-	case IdentifiedFileType::ISO_MODE2:  *errorString = "PSX game image detected."; break;
+	case IdentifiedFileType::PSX_ISO:  *errorString = "PSX game image detected."; break;
+	case IdentifiedFileType::PS2_ISO:  *errorString = "PS2 game image detected."; break;
+	case IdentifiedFileType::PS3_ISO:  *errorString = "PS2 game image detected."; break;
 	case IdentifiedFileType::NORMAL_DIRECTORY: *errorString = "Just a directory."; break;
 	case IdentifiedFileType::PPSSPP_SAVESTATE: *errorString = "This is a saved state, not a game."; break; // Actually, we could make it load it...
 	case IdentifiedFileType::PSP_SAVEDATA_DIRECTORY: *errorString = "This is save data, not a game."; break;
 	case IdentifiedFileType::PSP_PS1_PBP: *errorString = "PS1 EBOOTs are not supported by PPSSPP."; break;
+	case IdentifiedFileType::PSP_UMD_VIDEO_ISO: *errorString = "UMD Video ISOs are not supported by PPSSPP."; break;
 	case IdentifiedFileType::UNKNOWN_BIN:
 	case IdentifiedFileType::UNKNOWN_ELF:
 	case IdentifiedFileType::UNKNOWN_ISO:
@@ -325,12 +328,19 @@ static bool CPU_Init(FileLoader *fileLoader, IdentifiedFileType type, std::strin
 			gameTitle = g_CoreParameter.fileToStart.GetFilename();
 		}
 		break;
+	case IdentifiedFileType::PSP_UMD_VIDEO_ISO:
+	{
+		ERROR_LOG(Log::Loader, "PPSSPP doesn't support UMD Video.");
+		auto er = GetI18NCategory(I18NCat::ERRORS);
+		*errorString = er->T("PPSSPP doesn't support UMD Video.");
+		return false;
+	}
 	default:
 	{
 		// Trying to boot other things lands us here. We need to return a sensible error string.
 		ERROR_LOG(Log::Loader, "CPU_Init didn't recognize file. %s", errorString->c_str());
 		auto sy = GetI18NCategory(I18NCat::SYSTEM);
-		*errorString = sy->T("Not a PSP game");  // best string we have.
+		*errorString = sy->T("Not a PSP game");
 		return false;
 	}
 	}
@@ -492,6 +502,7 @@ static bool CPU_Init(FileLoader *fileLoader, IdentifiedFileType type, std::strin
 	}
 
 	InstallExceptionHandler(&Memory::HandleFault);
+
 	return true;
 }
 
@@ -590,7 +601,7 @@ bool PSP_InitStart(const CoreParameter &coreParam) {
 	}
 	g_CoreParameter.errorString.clear();
 
-	std::string *error_string = &g_CoreParameter.errorString;
+	std::string *errorString = &g_CoreParameter.errorString;
 
 	INFO_LOG(Log::Loader, "Starting loader thread...");
 
@@ -598,7 +609,7 @@ bool PSP_InitStart(const CoreParameter &coreParam) {
 
 	Core_NotifyLifecycle(CoreLifecycle::STARTING);
 
-	g_loadingThread = std::thread([error_string]() {
+	g_loadingThread = std::thread([errorString]() {
 		SetCurrentThreadName("ExecLoader");
 
 		AndroidJNIThreadContext jniContext;
@@ -606,14 +617,13 @@ bool PSP_InitStart(const CoreParameter &coreParam) {
 		NOTICE_LOG(Log::Boot, "PPSSPP %s", PPSSPP_GIT_VERSION);
 
 		Path filename = g_CoreParameter.fileToStart;
-		FileLoader *loadedFile = ResolveFileLoaderTarget(ConstructFileLoader(filename));
 
-		IdentifiedFileType type = Identify_File(loadedFile, &g_CoreParameter.errorString);
-		g_CoreParameter.fileType = type;
+		IdentifiedFileType fileType;
+		FileLoader *loadedFile = ResolveFileLoaderTarget(ConstructFileLoader(filename), &fileType, errorString);
 
 		if (System_GetPropertyBool(SYSPROP_ENOUGH_RAM_FOR_FULL_ISO)) {
 			if (g_Config.bCacheFullIsoInRam) {
-				switch (g_CoreParameter.fileType) {
+				switch (fileType) {
 				case IdentifiedFileType::PSP_ISO:
 				case IdentifiedFileType::PSP_ISO_NP:
 					loadedFile = new RamCachingFileLoader(loadedFile);
@@ -625,14 +635,16 @@ bool PSP_InitStart(const CoreParameter &coreParam) {
 			}
 		}
 
+		g_CoreParameter.fileType = fileType;
+
 		// TODO: The reason we pass in g_CoreParameter.errorString here is that it's persistent -
 		// it gets written to from the loader thread that gets spawned.
-		if (!CPU_Init(loadedFile, type, &g_CoreParameter.errorString)) {
+		if (!CPU_Init(loadedFile, fileType, &g_CoreParameter.errorString)) {
 			CPU_Shutdown(false);
 			g_CoreParameter.fileToStart.clear();
-			*error_string = g_CoreParameter.errorString;
-			if (error_string->empty()) {
-				*error_string = "Failed initializing CPU/Memory";
+			*errorString = g_CoreParameter.errorString;
+			if (errorString->empty()) {
+				*errorString = "Failed initializing CPU/Memory";
 			}
 			g_bootState = BootState::Failed;
 			return;
@@ -641,7 +653,7 @@ bool PSP_InitStart(const CoreParameter &coreParam) {
 		// Initialize the GPU as far as we can here (do things like load cache files).
 		_dbg_assert_(!gpu);
 #ifndef __LIBRETRO__
-		InitGPU(error_string);
+		InitGPU(errorString);
 #endif
 		g_bootState = BootState::Complete;
 	});

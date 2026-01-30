@@ -79,10 +79,12 @@ void DrawFramebuffersWindow(ImConfig &cfg, FramebufferManagerCommon *framebuffer
 	}
 
 	if (cfg.selectedFramebuffer != -1) {
+		ImGui::SliderFloat("Scale", &cfg.fbViewerZoom, 0.5f, 16.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+
 		// Now, draw the image of the selected framebuffer.
 		Draw::Framebuffer *fb = vfbs[cfg.selectedFramebuffer]->fbo;
 		ImTextureID texId = ImGui_ImplThin3d_AddFBAsTextureTemp(fb, Draw::Aspect::COLOR_BIT, ImGuiPipeline::TexturedOpaque);
-		ImGui::Image(texId, ImVec2(fb->Width(), fb->Height()));
+		ImGui::Image(texId, ImVec2(fb->Width() * cfg.fbViewerZoom, fb->Height() * cfg.fbViewerZoom));
 	}
 
 	ImGui::End();
@@ -499,7 +501,7 @@ void ImGePixelViewer::UpdateTexture(Draw::DrawContext *draw) {
 		case GE_FORMAT_5551:
 			if (showAlpha) {
 				uint32_t *dst32 = (uint32_t *)dst;
-				uint16_t *src16 = (uint16_t *)dst;
+				const uint16_t *src16 = (const uint16_t *)src;
 				for (int x = 0; x < width; x++) {
 					dst32[x] = (src16[x] >> 15) ? 0xFFFFFFFF : 0xFF000000;
 				}
@@ -512,7 +514,7 @@ void ImGePixelViewer::UpdateTexture(Draw::DrawContext *draw) {
 			break;
 		case GE_FORMAT_DEPTH16:
 		{
-			uint16_t *src16 = (uint16_t *)src;
+			const uint16_t *src16 = (const uint16_t *)src;
 			float scale = this->scale / 256.0f;
 			for (int x = 0; x < width; x++) {
 				// Just pick off the upper bits by adding 1 to the byte address
