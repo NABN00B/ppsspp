@@ -295,8 +295,8 @@ public:
 		}
 
 		// Place to border if out of bounds.
-		xbase = std::clamp(xbase, border, xmax);
-		ybase = std::clamp(ybase, border, ymax);
+		xbase = Clamp(xbase, border, xmax);
+		ybase = Clamp(ybase, border, ymax);
 
 		// Update location.
 		xbase += xspeed;
