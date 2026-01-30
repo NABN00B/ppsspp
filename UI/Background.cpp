@@ -276,14 +276,17 @@ public:
 		dc.Flush();
 
 		// Switch direction if within border.
+		float xmax = xres - border;
+		float ymax = yres - border;
 		bool should_recolor = false;
-		if (xbase > xres - border || xbase < border) {
-			xspeed *= -1.0f;
+
+		if (xbase > xmax || xbase < border) {
+			xspeed = -xspeed;
 			should_recolor = true;
 		}
 
-		if (ybase > yres - border || ybase < border) {
-			yspeed *= -1.0f;
+		if (ybase > ymax || ybase < border) {
+			yspeed = -yspeed;
 			should_recolor = true;
 		}
 
@@ -292,10 +295,8 @@ public:
 		}
 
 		// Place to border if out of bounds.
-		if (xbase > xres - border) xbase = xres - border;
-		else if (xbase < border) xbase = border;
-		if (ybase > yres - border) ybase = yres - border;
-		else if (ybase < border) ybase = border;
+		xbase = std::clamp(xbase, border, xmax);
+		ybase = std::clamp(ybase, border, ymax);
 
 		// Update location.
 		xbase += xspeed;
@@ -306,6 +307,7 @@ private:
 	static constexpr int COLOR_COUNT = 11;
 	static constexpr Color COLORS[COLOR_COUNT] = {0xFFFFFFFF, 0xFFFFFF00, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF,
 			0xFF00FFFF, 0xFFFF00FF, 0xFF4111D1, 0xFF3577F3, 0xFFAA77FF, 0xFF623B84};
+	static constexpr float BORDER_SIZE = 35.0f;
 
 	float xbase = 0.0f;
 	float ybase = 0.0f;
@@ -314,7 +316,7 @@ private:
 	float xspeed = 1.0f;
 	float yspeed = 1.0f;
 	float scale = 1.0f;
-	float border = 35.0f;
+	float border = BORDER_SIZE;
 	int color_ix = 0;
 	int last_color_ix = -1;
 	GMRng rng;
@@ -328,16 +330,16 @@ private:
 
 			// Determine initial direction.
 			rng.Init(time_now_d() * 100239);
-			if (rng.R32() % 2) xspeed *= -1.0f;
-			if (rng.R32() % 2) yspeed *= -1.0f;
+			if (rng.R32() % 2 != 0) xspeed = -xspeed;
+			if (rng.R32() % 2 != 0) yspeed = -yspeed;
 		}
 
 		// Scale certain attributes to resolution.
 		scale = std::min(xres, yres) / 400.0f;
 		float speed = scale < 2.5f ? scale * 0.58f : scale * 0.46f;
-		xspeed = std::signbit(xspeed) ? speed * -1.0f : speed;
-		yspeed = std::signbit(yspeed) ? speed * -1.0f : speed;
-		border = 35.0f * scale;
+		xspeed = std::copysign(speed, xspeed);
+		yspeed = std::copysign(speed, yspeed);
+		border = BORDER_SIZE * scale;
 
 		last_xres = xres;
 		last_yres = yres;
