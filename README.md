@@ -25,8 +25,36 @@ To download fresh development builds for Android, Windows and Mac, [go to the /d
 
 For game compatibility, see [community compatibility feedback](https://report.ppsspp.org/games).
 
+What's new in 1.20.3
+--------------------
+
+- Fix issue preventing ad hoc relay servers from working when RetroAchievements are enabled on Windows ([#21420])
+- Fix crash/failure setting the background on iOS ([#21409])
+- Fix logging to file ([#21412])
+- Networking settings cleanup ([#21418])
+- Some fixes for assorted rare crashes ([#21422])
+- Fix issues when unpausing using a controller binding ([#21424]), DualSense Edge detection on Windows ([#21426])
+- Fix missing savestate undo button ([#21425])
+- MMPX texture upscaling algorithm has been restored, the new one has been improved ([#21376]) and renamed MMPX Advanced ([#21421])
+
+What's new in 1.20.2
+--------------------
+
+- Improved server list for ad hoc multiplayer, dynamically updated and you can now add/remove entries ([#21326], [#21389], [#21351])
+- Fix broken multitouch on iOS with OpenGL ([#21350])
+- Ad hoc relay connection improvements ([#21352])
+- Fix a lot of minor UI issues ([#21400], [#21362])
+- Fix background image selection on Android ~~and iOS~~ ([#21345], [#21384], [#21371])
+- Fix file permission issue on iOS ([#21374])
+- Add a "hold" version of axis swap toggle ([#21357])
+- Fix regression in Gripshift ([#21377])
+- Fix crash on audio device switch on Windows ([#21341])
+- Fix timing glitches in gamepad input on Windows ([#21393])
+- And other assorted fixes.
+
 What's new in 1.20
 ------------------
+
 - User interface
   - New feature: Proper support for Portrait Mode UI - you can now rotate your phone to vertical mode, and things will mostly work fine! ([#21185], [#21044]...)
   - New feature: Separate touch controls and display layout configs for landscape/portrait, new default touch control layout for portrait mode
@@ -42,7 +70,7 @@ What's new in 1.20
   - Soundtrack is working again in Tony Hawk's Project 8 ([#20775])
   - Fix crash in StormBasic homebrew apps ([#20715])
   - Built-in songs in Beats work again ([#20662])
-  - Fix adhoc in Syphon Filter games ([#20642])
+   - Fix adhoc in Syphon Filter games ([#20642])
   - Fix strange cutscene speedups in Power Stone 2 (Power Stone Collection) ([#2124])
   - Work around game bug to help more custom songs play again in GTA LCS ([#20692])
 
@@ -88,6 +116,8 @@ What's new in 1.20
   - Linux
     - Loongarch improvements by KatyushaScarlet ([#20683], [#20644], [#20599], [#20594]), text rendering improvements ([#21163])
     - SDL fullscreen problems fixed ([#21300], more)
+  - UWP
+    - Migrate code base to C++/WinRT ([#21100])
 
 - Debugger
   - ImDebugger improvements ([#20861], [#20779], [#20657], [#20637], [#20550], [#20523])
@@ -401,3 +431,29 @@ See [history.md](history.md).
 [#21042]: https://github.com/hrydgard/ppsspp/issues/21042 "Setting out of game UI confirmation button to O makes both O and X into UI confirmation buttons"
 [#21325]: https://github.com/hrydgard/ppsspp/issues/21325 "Controls: Add a setting for the threshold used to map analog stick inputs to digital buttons"
 [#21306]: https://github.com/hrydgard/ppsspp/issues/21306 "Server list update, add virtual keyboard to PopupTextInputChoice"
+[#21326]: https://github.com/hrydgard/ppsspp/issues/21326 "Adhoc server list: Show metadata"
+[#21389]: https://github.com/hrydgard/ppsspp/issues/21389 "Adhoc server list work, add missing translations"
+[#21351]: https://github.com/hrydgard/ppsspp/issues/21351 "Ad hoc server list refactor: Parse the server list from a json file"
+[#21350]: https://github.com/hrydgard/ppsspp/issues/21350 "Fix multitouch in OpenGL mode on iOS. Oops."
+[#21352]: https://github.com/hrydgard/ppsspp/issues/21352 "Handle adhoc relay connection a bit better"
+[#21400]: https://github.com/hrydgard/ppsspp/issues/21400 "Fix minor UI centering issues and similar"
+[#21362]: https://github.com/hrydgard/ppsspp/issues/21362 "More UI-related fixes"
+[#21345]: https://github.com/hrydgard/ppsspp/issues/21345 "Fix image picker on Android, plus smoother fullscreen startup on Windows"
+[#21384]: https://github.com/hrydgard/ppsspp/issues/21384 "Android background image selection: Scale down selected background image when too large"
+[#21371]: https://github.com/hrydgard/ppsspp/issues/21371 "Various cleanups, iCloud fix"
+[#21374]: https://github.com/hrydgard/ppsspp/issues/21374 "iOS: Preserve permissions to access files across runs"
+[#21357]: https://github.com/hrydgard/ppsspp/issues/21357 "Add a \"hold\" version of the axis swap toggle. Often more convenient."
+[#21377]: https://github.com/hrydgard/ppsspp/issues/21377 "Windows audio fix, Gripshift glitch workaround"
+[#21341]: https://github.com/hrydgard/ppsspp/issues/21341 "Fix crash on audio device switch in Windows"
+[#21393]: https://github.com/hrydgard/ppsspp/issues/21393 "Windows input optimizations"
+[#21100]: https://github.com/hrydgard/ppsspp/issues/21100 "UWP: Migrate from C++/CX to C++/WinRT"
+[#21420]: https://github.com/hrydgard/ppsspp/issues/21420 "Misc: Update aemu_postoffice, add confirmation dialog when creating game configs"
+[#21409]: https://github.com/hrydgard/ppsspp/issues/21409 "Image picker on iOS: Fix crash, use a newer method that opens a lot quicker"
+[#21412]: https://github.com/hrydgard/ppsspp/issues/21412 "Fix logging to file, assorted minor fixes"
+[#21418]: https://github.com/hrydgard/ppsspp/issues/21418 "Networking settings: Some reordering and naming cleanup, link to quickstart guide"
+[#21422]: https://github.com/hrydgard/ppsspp/issues/21422 "Fixes for some rarer crashes from Play reports"
+[#21424]: https://github.com/hrydgard/ppsspp/issues/21424 "Fix control input issues when toggling the pause menu using a controller"
+[#21425]: https://github.com/hrydgard/ppsspp/issues/21425 "Fix accidentally missing undo button on the savestate popup."
+[#21376]: https://github.com/hrydgard/ppsspp/issues/21376 "enhance MMPX algorithm bug fixes and logic optimizations"
+[#21421]: https://github.com/hrydgard/ppsspp/issues/21421 "Split MMPX texture upscaling shader into regular and advanced"
+[#21426]: https://github.com/hrydgard/ppsspp/issues/21426 "Add detection of Dualsense Edge controllers on Windows, update README.md"

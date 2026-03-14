@@ -200,6 +200,10 @@ void UIScreen::deviceRestored(Draw::DrawContext *draw) {
 		root_->DeviceRestored(draw);
 }
 
+Bounds UIScreen::GetLayoutBounds(UIContext &dc) const {
+	return dc.GetLayoutBounds(ignoreBottomInset_);
+}
+
 ScreenRenderFlags UIScreen::render(ScreenRenderMode mode) {
 	DoRecreateViews();
 
@@ -262,6 +266,10 @@ void UIDialogScreen::sendMessage(UIMessage message, const char *value) {
 	if (screen) {
 		screen->sendMessage(message, value);
 	}
+}
+
+UIDialogScreen::~UIDialogScreen() {
+	System_NotifyUIEvent(UIEventNotification::DIALOG_CLOSED);
 }
 
 bool UIScreen::IsOnTop() const {

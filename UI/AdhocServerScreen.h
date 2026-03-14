@@ -22,9 +22,13 @@ public:
 protected:
 	void OnCompleted(DialogResult result) override;
 	bool CanComplete(DialogResult result) override;
+	virtual UI::Size PopupWidth() const override { return 650; }
 
 	void sendMessage(UIMessage message, const char *value) override;
 
+	void dialogFinished(const Screen *screen, DialogResult result) override {
+		RecreateViews();
+	}
 private:
 	void ResolverThread();
 
@@ -50,3 +54,5 @@ private:
 	bool lastResolvedResult_ = false;
 };
 
+void AskToEditCurrentServer(int requestToken, ScreenManager *screenManager);
+bool AdhocServerNameIsCustom();

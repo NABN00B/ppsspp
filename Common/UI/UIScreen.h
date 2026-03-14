@@ -62,6 +62,8 @@ public:
 protected:
 	virtual void CreateViews() = 0;
 
+	Bounds GetLayoutBounds(UIContext &dc) const;
+
 	void RecreateViews() override { recreateViews_ = true; }
 	DeviceOrientation GetDeviceOrientation() const;
 	bool IsOnTop() const;
@@ -91,6 +93,7 @@ private:
 class UIDialogScreen : public UIScreen {
 public:
 	UIDialogScreen() : UIScreen(), finished_(false) {}
+	~UIDialogScreen() override;
 	bool key(const KeyInput &key) override;
 	void sendMessage(UIMessage message, const char *value) override;
 

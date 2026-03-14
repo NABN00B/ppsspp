@@ -107,14 +107,21 @@ struct AdhocServerListEntry {
 	std::string name;
 	std::string host;
 	std::string web;
+	std::string ip;  // could be used as a fallback if DNS resolution fails. Currently unused.
 	std::string discord;
 	std::string location;
 	std::string description;
+	std::string statusUrl;  // Usually empty or /data.json.
 	AdhocDataMode mode = AdhocDataMode::P2P;
 };
 
-void AdhocLoadServerList();
-std::vector<AdhocServerListEntry> AdhocGetServerList();
+enum class AdhocLoadListMode {
+	CacheOnlySync,
+	AllSourcesAsync,
+};
+
+void AdhocLoadServerList(AdhocLoadListMode loadMode);
+std::vector<AdhocServerListEntry> AdhocGetServerList(AdhocLoadListMode loadMode);
 
 class PointerWrap;
 

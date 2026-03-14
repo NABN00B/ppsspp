@@ -503,6 +503,9 @@ EmuScreen::~EmuScreen() {
 		g_Discord.ClearPresence();
 	else
 		g_Discord.SetPresenceMenu();
+
+	// This makes sure that the recents list is updated, among other things.
+	g_Config.Save("exitGame");
 }
 
 void EmuScreen::dialogFinished(const Screen *dialog, DialogResult result) {
@@ -1264,7 +1267,7 @@ void EmuScreen::CreateViews() {
 
 	TouchControlConfig &touch = g_Config.GetTouchControlsConfig(deviceOrientation);
 
-	const Bounds &bounds = screenManager()->getUIContext()->GetLayoutBounds();
+	const Bounds &bounds = GetLayoutBounds(*screenManager()->getUIContext());
 	InitPadLayout(&touch, deviceOrientation, bounds.w, bounds.h);
 
 	root_ = CreatePadLayout(touch, bounds.w, bounds.h, &pauseTrigger_, &g_controlMapper);
@@ -1966,10 +1969,10 @@ void EmuScreen::renderUI() {
 
 	if (PSP_IsInited()) {
 		if ((DebugOverlay)g_Config.iDebugOverlay == DebugOverlay::CONTROL) {
-			DrawControlMapperOverlay(ctx, ctx->GetLayoutBounds(), g_controlMapper);
+			DrawControlMapperOverlay(ctx, GetLayoutBounds(*ctx), g_controlMapper);
 		}
 		if (g_Config.iShowStatusFlags) {
-			DrawFPS(ctx, ctx->GetLayoutBounds());
+			DrawFPS(ctx, GetLayoutBounds(*ctx));
 		}
 	}
 

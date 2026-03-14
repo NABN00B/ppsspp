@@ -49,6 +49,7 @@ enum class LaunchUrlType {
 	EMAIL_ADDRESS,
 	LOCAL_FILE,
 	LOCAL_FOLDER,  // Shows the folder. Not supported on all systems of course.
+	AUTO,
 };
 
 void System_Vibrate(int length_ms);
@@ -61,6 +62,7 @@ void System_LaunchUrl(LaunchUrlType urlType, std::string_view url);
 enum class UIEventNotification {
 	MENU_RETURN,
 	POPUP_CLOSED,
+	DIALOG_CLOSED,
 	TEXT_GOTFOCUS,
 	TEXT_LOSTFOCUS,
 };

@@ -1389,9 +1389,12 @@ elseif(IOS AND NOT LIBRETRO)
 		Common/Battery/AppleBatteryClient.m
 	)
 
-	list(APPEND nativeExtraLibs "-framework Foundation -framework MediaPlayer -framework AudioToolbox -framework CoreGraphics -framework CoreMotion -framework QuartzCore -framework UIKit -framework GLKit -framework OpenAL -framework AVFoundation -framework CoreLocation -framework CoreText -framework CoreVideo -framework CoreMedia -framework CoreServices -framework Metal -framework IOSurface" )
+	list(APPEND nativeExtraLibs "-framework Foundation -framework MediaPlayer -framework AudioToolbox -framework CoreGraphics -framework CoreMotion -framework QuartzCore -framework UIKit -framework GLKit -framework OpenAL -framework AVFoundation -framework CoreLocation -framework CoreText -framework CoreVideo -framework CoreMedia -framework CoreServices -framework Metal -framework IOSurface -framework Photos" )
 	if(EXISTS "${CMAKE_IOS_SDK_ROOT}/System/Library/Frameworks/GameController.framework")
 		list(APPEND nativeExtraLibs "-weak_framework GameController")
+	endif()
+	if(EXISTS "${CMAKE_IOS_SDK_ROOT}/System/Library/Frameworks/PhotosUI.framework")
+		list(APPEND nativeExtraLibs "-weak_framework PhotosUI")
 	endif()
 
 	if(NOT ICONV_LIBRARY)
@@ -2083,7 +2086,7 @@ if(LINUX OR ANDROID OR MACOSX OR IOS)
 	)
 endif()
 
-if(MACOSX OR IOS)
+if((MACOSX OR IOS) AND NOT LIBRETRO)
 	list(APPEND CoreExtra
 		Core/Util/DarwinFileSystemServices.mm
 		Core/Util/DarwinFileSystemServices.h)
@@ -2530,7 +2533,7 @@ add_library(${CoreLibName} ${CoreLinkType}
 	${CMAKE_CURRENT_BINARY_DIR}/git-version.cpp
 )
 
-if(MACOSX OR IOS)
+if((MACOSX OR IOS) AND NOT LIBRETRO)
 	set_source_files_properties(Core/Util/DarwinFileSystemServices.mm
 		PROPERTIES COMPILE_FLAGS -fobjc-arc)
 endif()

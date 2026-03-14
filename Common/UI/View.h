@@ -834,6 +834,8 @@ public:
 	void SetRightText(std::string_view text) {
 		rightText_ = text;
 	}
+protected:
+	void GetContentDimensionsBySpec(const UIContext &dc, MeasureSpec horiz, MeasureSpec vert, float &w, float &h) const override;
 
 private:
 	std::string text_;
@@ -857,7 +859,7 @@ public:
 	}
 
 protected:
-	virtual std::string ValueText() const = 0;
+	virtual std::string ValueText(bool *shadow) const = 0;
 	virtual ImageID ValueImage() const { return ImageID::invalid(); }
 
 	float CalculateValueScale(const UIContext &dc, std::string_view valueText, float availWidth) const;
@@ -870,7 +872,8 @@ public:
 	ChoiceWithCallbackValueDisplay(std::string_view text, std::function<std::string()> valueFunc, LayoutParams *layoutParams = nullptr)
 		: AbstractChoiceWithValueDisplay(text, layoutParams), valueFunc_(valueFunc) {}
 protected:
-	std::string ValueText() const override {
+	std::string ValueText(bool *shadow) const override {
+		*shadow = false;
 		return valueFunc_();
 	}
 	std::function<std::string()> valueFunc_;
@@ -1052,7 +1055,7 @@ public:
 	std::string DescribeText() const override { return GetText(); }
 	void SetSmall(bool small) { textSize_ = TextSize::Small; }
 	void SetBig(bool big) { textSize_ = TextSize::Big; }
-	void SetTextSize(TextSize size) { textSize_ = size; }
+	TextView *SetTextSize(TextSize size) { textSize_ = size; return this; }
 	void SetTextColor(uint32_t color) { textColor_ = color; hasTextColor_ = true; }
 	void SetShadow(bool shadow) { shadow_ = shadow; }
 	void SetFocusable(bool focusable) { focusable_ = focusable; }
@@ -1060,6 +1063,7 @@ public:
 	void SetBullet(bool bullet) { bullet_ = bullet; }
 	void SetPadding(Margins padding) { pad_ = padding; }
 	void SetAlign(int align) { textAlign_ = align; }
+	TextView *SetWordWrap();
 
 	bool CanBeFocused() const override { return focusable_; }
 
@@ -1081,7 +1085,7 @@ class ClickableTextView : public TextView {
 public:
 	ClickableTextView(std::string_view text, LayoutParams *layoutParams = 0)
 		: TextView(text, layoutParams) {}
-	bool Touch(const TouchInput &input);
+	bool Touch(const TouchInput &input) override;
 	Event OnClick;
 
 private:
@@ -1136,15 +1140,18 @@ private:
 class ImageView : public InertView {
 public:
 	ImageView(ImageID atlasImage, const std::string &text, LayoutParams *layoutParams = nullptr);
+	ImageView(std::function<ImageID()> func, LayoutParams *layoutParams = nullptr);
 	void GetContentDimensions(const UIContext &dc, float &w, float &h) const override;
 	void Draw(UIContext &dc) override;
 	std::string DescribeText() const override { return text_; }
 	void SetScale(float s) { scale_ = s; }  // Only used for measuring.
+	void SetFunc(std::function<ImageID()> func) { func_ = func; }
 
 private:
 	std::string text_;
 	ImageID atlasImage_;
 	float scale_ = 1.0f;
+	std::function<ImageID()> func_;
 };
 
 class ProgressBar : public InertView {

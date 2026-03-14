@@ -291,3 +291,18 @@ void GameInfoBGView::Draw(UIContext &dc) {
 		}
 	}
 }
+
+SettingHint::SettingHint(std::string_view text, UI::View *setting)
+	: UI::TextView(text, new UI::LinearLayoutParams(UI::FILL_PARENT, UI::WRAP_CONTENT)), setting_(setting) {
+	SetTextSize(UI::TextSize::Tiny);
+	SetPadding(UI::Margins(14, 0, 12, 8));
+	SetAlign(FLAG_WRAP_TEXT);
+}
+
+void SettingHint::Draw(UIContext &dc) {
+	const bool enabled = setting_ ? setting_->IsEnabled() : true;
+	const UI::Style &style = enabled ? dc.GetTheme().itemStyle : dc.GetTheme().itemDisabledStyle;
+	SetTextColor(style.fgColor);  // bit hacky but works
+	dc.FillRect(style.background, bounds_);
+	UI::TextView::Draw(dc);
+}

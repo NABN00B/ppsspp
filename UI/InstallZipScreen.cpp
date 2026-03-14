@@ -161,9 +161,13 @@ void InstallZipScreen::CreateContentViews(UI::ViewGroup *parent) {
 				destFolders_.push_back(parent);
 			}
 			if (g_Config.currentDirectory.IsLocalType() && File::Exists(g_Config.currentDirectory) && g_Config.currentDirectory != parent) {
-				destFolders_.push_back(g_Config.currentDirectory);
+				if (!Contains(destFolders_, g_Config.currentDirectory)) {
+					destFolders_.push_back(g_Config.currentDirectory);
+				}
 			}
-			destFolders_.push_back(g_Config.memStickDirectory);
+			if (!Contains(destFolders_, g_Config.memStickDirectory)) {
+				destFolders_.push_back(g_Config.memStickDirectory);
+			}
 		} else {
 			destFolders_.push_back(GetSysDirectory(DIRECTORY_GAME));
 		}
