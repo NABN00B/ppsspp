@@ -372,11 +372,20 @@ void GameInfo::ParseParamSFO(IdentifiedFileType type) {
 	title = paramSFO.GetValueString("TITLE");
 	if (type != IdentifiedFileType::PSP_UMD_VIDEO_ISO) {
 		id = paramSFO.GetValueString("DISC_ID");
-		id_version = id + "_" + paramSFO.GetValueString("DISC_VERSION");
 		disc_total = paramSFO.GetValueInt("DISC_TOTAL");
 		disc_number = paramSFO.GetValueInt("DISC_NUMBER");
 		// region = paramSFO.GetValueInt("REGION");  // Always seems to be 32768?
-		region = DetectGameRegionFromID(id);
+
+		if (type == IdentifiedFileType::PSP_SAVEDATA_DIRECTORY) {
+			// Savedata don't have "DISC_ID" or "DISC_VERSION". Let's use "SAVEDATA_DIRECTORY" instead.
+			id_version = ginfo->GetParamSFO().GetValueString("SAVEDATA_DIRECTORY");
+			std::string_view gameId = id_version;
+			region = DetectGameRegionFromID(gameId.substr(0, 9));
+		} else {
+			id_version = id + "_" + paramSFO.GetValueString("DISC_VERSION");
+			region = DetectGameRegionFromID(id);
+		}
+
 	} else {
 		id.clear();
 		id_version.clear();
