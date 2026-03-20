@@ -408,6 +408,13 @@ void GameButton::Draw(UIContext &dc) {
 		dc.Draw()->Flush();
 	}
 
+	if (gridStyle_ && g_Config.bShowIDOnGameIcon /*&& ginfo->fileType != IdentifiedFileType::PSP_ELF*/ && !ginfo->id_version.empty()) {
+		dc.SetFontScale(0.5f * g_Config.fGameGridScale, 0.5f * g_Config.fGameGridScale);
+		dc.DrawText(ginfo->id_version, bounds_.x + 5, y + 1, 0xFF000000, ALIGN_TOPLEFT);
+		dc.DrawText(ginfo->id_version, bounds_.x + 4, y, dc.GetTheme().infoStyle.fgColor, ALIGN_TOPLEFT);
+		dc.SetFontScale(1.0f, 1.0f);
+	}
+
 	if (imageIcon.isValid()) {
 		Style style = dc.GetTheme().itemStyle;
 
