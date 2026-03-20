@@ -487,12 +487,12 @@ void GameButton::Draw(UIContext &dc) {
 			}
 		}
 	} else if (ginfo->fileType == IdentifiedFileType::PSP_SAVEDATA_DIRECTORY) {	
-		const AtlasImage *disketteImage = dc.Draw()->GetAtlas()->getImage(ImageID("I_FLAG_HB"));
+		const AtlasImage *disketteImage = dc.Draw()->GetAtlas()->getImage(ImageID("I_DISKETTE"));
 		if (disketteImage) {
 			if (gridStyle_) {
-				dc.Draw()->DrawImage(ImageID("I_FLAG_HB"), bounds_.x, y + h - disketteImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
+				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x, y + h - disketteImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(ImageID("I_FLAG_HB"), bounds_.x + 4, y, 1.0f);
+				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x + 4, y, 1.0f);
 			}
 		}
 	}

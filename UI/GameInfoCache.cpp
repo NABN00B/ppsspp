@@ -378,7 +378,7 @@ void GameInfo::ParseParamSFO(IdentifiedFileType type) {
 
 		if (type == IdentifiedFileType::PSP_SAVEDATA_DIRECTORY) {
 			// Savedata don't have "DISC_ID" or "DISC_VERSION". Let's use "SAVEDATA_DIRECTORY" instead.
-			id_version = ginfo->GetParamSFO().GetValueString("SAVEDATA_DIRECTORY");
+			id_version = paramSFO.GetValueString("SAVEDATA_DIRECTORY");
 			std::string_view gameId = id_version;
 			region = DetectGameRegionFromID(gameId.substr(0, 9));
 		} else {
