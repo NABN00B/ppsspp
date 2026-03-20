@@ -408,13 +408,6 @@ void GameButton::Draw(UIContext &dc) {
 		dc.Draw()->Flush();
 	}
 
-	if (gridStyle_ && g_Config.bShowIDOnGameIcon /*&& ginfo->fileType != IdentifiedFileType::PSP_ELF*/ && !ginfo->id_version.empty()) {
-		dc.SetFontScale(0.5f * g_Config.fGameGridScale, 0.5f * g_Config.fGameGridScale);
-		dc.DrawText(ginfo->id_version, bounds_.x + 5, y + 1, 0xFF000000, ALIGN_TOPLEFT);
-		dc.DrawText(ginfo->id_version, bounds_.x + 4, y, dc.GetTheme().infoStyle.fgColor, ALIGN_TOPLEFT);
-		dc.SetFontScale(1.0f, 1.0f);
-	}
-
 	if (imageIcon.isValid()) {
 		Style style = dc.GetTheme().itemStyle;
 
@@ -490,7 +483,7 @@ void GameButton::Draw(UIContext &dc) {
 			if (gridStyle_) {
 				dc.Draw()->DrawImage(ImageID("I_GEAR_SMALL"), bounds_.x, y + h - gearImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(ImageID("I_GEAR_SMALL"), bounds_.x + 3, y + 2, 1.0f);
+				dc.Draw()->DrawImage(ImageID("I_GEAR_SMALL"), bounds_.x + 4, y, 1.0f);
 			}
 		}
 	} else if (ginfo->fileType == IdentifiedFileType::PSP_SAVEDATA_DIRECTORY) {	
@@ -499,7 +492,7 @@ void GameButton::Draw(UIContext &dc) {
 			if (gridStyle_) {
 				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x, y + h - disketteImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x + 3, y + 2, 1.0f);
+				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x + 5, y + 1, 1.0f);
 			}
 		}
 	}
@@ -520,9 +513,16 @@ void GameButton::Draw(UIContext &dc) {
 				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + bounds_.w - (image->w + 5)*g_Config.fGameGridScale,
 							y + h - (image->h + 5)*g_Config.fGameGridScale, g_Config.fGameGridScale);
 			} else {
-				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + 1, y + h - image->h - 2, 1.0f);
+				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + 4, y + h - image->h - 5, 1.0f);
 			}
 		}
+	}
+
+	if (gridStyle_ && g_Config.bShowIDOnGameIcon && !ginfo->id_version.empty()) {
+		dc.SetFontScale(0.5f * g_Config.fGameGridScale, 0.5f * g_Config.fGameGridScale);
+		dc.DrawText(ginfo->id_version, bounds_.x + 5, y + 1, 0xFF000000, ALIGN_TOPLEFT);
+		dc.DrawText(ginfo->id_version, bounds_.x + 4, y, dc.GetTheme().infoStyle.fgColor, ALIGN_TOPLEFT);
+		dc.SetFontScale(1.0f, 1.0f);
 	}
 
 	if (overlayColor) {
