@@ -300,9 +300,6 @@ void GameButton::Draw(UIContext &dc) {
 	if (down_) {
 		style = dc.GetTheme().itemDownStyle;
 	}
-	if (startsWith(ginfo->GetTitle(), "Nddemo")) {
-		style = style;
-	}
 
 	// Some types we just draw a default icon for.
 	ImageID imageIcon = ImageID::invalid();
@@ -411,18 +408,6 @@ void GameButton::Draw(UIContext &dc) {
 		dc.Draw()->Flush();
 	}
 
-	if (gridStyle_ && g_Config.bShowIDOnGameIcon && ginfo->fileType != IdentifiedFileType::PSP_ELF && !ginfo->id_version.empty()) {
-		std::string_view idStr = ginfo->id_version;
-		if (ginfo->fileType == IdentifiedFileType::PSP_SAVEDATA_DIRECTORY) {
-			auto ga = GetI18NCategory(I18NCat::GAME);
-			idStr = ga->T("SaveData");
-		}
-		dc.SetFontScale(0.5f * g_Config.fGameGridScale, 0.5f * g_Config.fGameGridScale);
-		dc.DrawText(idStr, bounds_.x + 5, y + 1, 0xFF000000, ALIGN_TOPLEFT);
-		dc.DrawText(idStr, bounds_.x + 4, y, dc.GetTheme().infoStyle.fgColor, ALIGN_TOPLEFT);
-		dc.SetFontScale(1.0f, 1.0f);
-	}
-
 	if (imageIcon.isValid()) {
 		Style style = dc.GetTheme().itemStyle;
 
@@ -451,7 +436,7 @@ void GameButton::Draw(UIContext &dc) {
 			dc.PushScissor(bounds_);
 			const std::string currentTitle = ginfo->GetTitle();
 			if (!currentTitle.empty()) {
-				title_ = ReplaceAll(currentTitle, "\n", " ");
+				title_ = SanitizeString(currentTitle, StringRestriction::NoLineBreaksOrSpecials);
 			}
 
 			dc.MeasureText(dc.GetFontStyle(), 1.0f, 1.0f, title_, &tw, &th, 0);
@@ -501,6 +486,15 @@ void GameButton::Draw(UIContext &dc) {
 				dc.Draw()->DrawImage(ImageID("I_GEAR_SMALL"), bounds_.x + 4, y, 1.0f);
 			}
 		}
+	} else if (ginfo->fileType == IdentifiedFileType::PSP_SAVEDATA_DIRECTORY) {	
+		const AtlasImage *disketteImage = dc.Draw()->GetAtlas()->getImage(ImageID("I_DISKETTE"));
+		if (disketteImage) {
+			if (gridStyle_) {
+				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x, y + h - disketteImage->h*g_Config.fGameGridScale, g_Config.fGameGridScale);
+			} else {
+				dc.Draw()->DrawImage(ImageID("I_DISKETTE"), bounds_.x + 5, y + 1, 1.0f);
+			}
+		}
 	}
 
 	const int regionIndex = (int)ginfo->region;
@@ -522,6 +516,13 @@ void GameButton::Draw(UIContext &dc) {
 				dc.Draw()->DrawImage(regionIcons[regionIndex], bounds_.x + 4, y + h - image->h - 5, 1.0f);
 			}
 		}
+	}
+
+	if (gridStyle_ && g_Config.bShowIDOnGameIcon && !ginfo->id_version.empty()) {
+		dc.SetFontScale(0.5f * g_Config.fGameGridScale, 0.5f * g_Config.fGameGridScale);
+		dc.DrawText(ginfo->id_version, bounds_.x + 5, y + 1, 0xFF000000, ALIGN_TOPLEFT);
+		dc.DrawText(ginfo->id_version, bounds_.x + 4, y, dc.GetTheme().infoStyle.fgColor, ALIGN_TOPLEFT);
+		dc.SetFontScale(1.0f, 1.0f);
 	}
 
 	if (overlayColor) {
