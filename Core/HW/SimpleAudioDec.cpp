@@ -576,8 +576,10 @@ int AuCtx::AuCheckStreamDataNeeded() {
 
 int AuCtx::AuStreamBytesNeeded() {
 	if (decoder->GetAudioType() == PSP_CODEC_MP3) {
-		// The endPos and readPos are not considered, except when you've read to the end.
-		if (readPos >= endPos)
+		// Only check if we've reached the end if endPos has been initialized.
+		// endPos is 0 when the handle is created without mp3Addr, which means buffers
+		// haven't been set up yet (different init sequence). Don't return 0 in that case.
+		if (endPos && readPos >= endPos)
 			return 0;
 		
 		// For streaming (especially track changes), we should start playback as soon as
