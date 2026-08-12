@@ -150,9 +150,7 @@ static int CalculateMp3DecodeDelay(AuCtx *ctx) {
 		// Calculate milliseconds per frame: (samples per frame * 1000) / sample rate
 		int delayMs = (ctx->MaxOutputSample * 1000) / ctx->SamplingRate;
 		// Clamp to reasonable range (5ms to 50ms)
-		if (delayMs < 5) delayMs = 5;
-		if (delayMs > 50) delayMs = 50;
-		return delayMs;
+		return std::clamp(delayMs, 5, 50);
 	}
 	// Fallback delay if context is not fully initialized yet
 	// Standard MP3: 1152 samples at 44100 Hz = ~26ms
