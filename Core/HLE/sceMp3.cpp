@@ -139,8 +139,25 @@ public:
 };
 
 std::map<u32, AuCtx *> g_mp3Map;
-static const int mp3DecodeDelay = 2400;
 static bool resourceInited = false;
+
+// Calculate the appropriate decode delay based on frame size and sample rate.
+// For MP3, one frame typically contains 1152 samples.
+// At 44100 Hz, that's about 26ms per frame. The old hardcoded 2400ms was far too long!
+// This was causing audio starvation and choppy playback in Beats (#14812).
+static int CalculateMp3DecodeDelay(AuCtx *ctx) {
+	if (ctx && ctx->MaxOutputSample > 0 && ctx->SamplingRate > 0) {
+		// Calculate milliseconds per frame: (samples per frame * 1000) / sample rate
+		int delayMs = (ctx->MaxOutputSample * 1000) / ctx->SamplingRate;
+		// Clamp to reasonable range (5ms to 50ms)
+		if (delayMs < 5) delayMs = 5;
+		if (delayMs > 50) delayMs = 50;
+		return delayMs;
+	}
+	// Fallback delay if context is not fully initialized yet
+	// Standard MP3: 1152 samples at 44100 Hz = ~26ms
+	return 26;
+}
 
 static AuCtx *getMp3Ctx(u32 mp3) {
 	if (g_mp3Map.find(mp3) == g_mp3Map.end())
@@ -214,6 +231,8 @@ static int sceMp3Decode(u32 mp3, u32 outPcmPtr) {
 
 	int pcmBytes = ctx->AuDecode(outPcmPtr);
 	if (pcmBytes > 0) {
+		// Calculate appropriate delay based on frame size and sample rate
+		int mp3DecodeDelay = CalculateMp3DecodeDelay(ctx);
 		// decode data successfully, delay thread
 		return hleDelayResult(hleLogDebug(Log::ME, pcmBytes), "mp3 decode", mp3DecodeDelay);
 	} else if (pcmBytes == 0) {
