@@ -594,28 +594,30 @@ int AuCtx::AuStreamWorkareaSize() {
 u32 AuCtx::AuNotifyAddStreamData(int size) {
 	int offset = AuStreamWorkareaSize();
 
-	if (askedReadSize != 0) {
-		// Old save state, numbers already adjusted.
-		int diffsize = size - askedReadSize;
-		// Notify the real read size
-		if (diffsize != 0) {
-			readPos += diffsize;
-			AuBufAvailable += diffsize;
-		}
-		askedReadSize = 0;
-	} else {
-		readPos += size;
-		AuBufAvailable += size;
-	}
-
 	// `size` is game-supplied and was previously trusted outright: a negative value
 	// would make sourcebuff.resize() attempt a huge allocation (size_t underflow),
 	// and an unbounded positive value would grow sourcebuff without limit (DoS).
 	// The validated range also has to match what's actually read below - it was
 	// checking [AuBuf, AuBuf+size) while the copy reads from [AuBuf+offset, ...).
+	// Only update counters if data is actually valid and can be copied!
 	if (size > 0 && size <= (int)AuBufSize && Memory::IsValidRange(AuBuf + offset, size)) {
 		sourcebuff.resize(sourcebuff.size() + size);
 		Memory::MemcpyUnchecked(&sourcebuff[sourcebuff.size() - size], AuBuf + offset, size);
+
+		// Only update tracking after successful copy
+		if (askedReadSize != 0) {
+			// Old save state, numbers already adjusted.
+			int diffsize = size - askedReadSize;
+			// Notify the real read size
+			if (diffsize != 0) {
+				readPos += diffsize;
+				AuBufAvailable += diffsize;
+			}
+			askedReadSize = 0;
+		} else {
+			readPos += size;
+			AuBufAvailable += size;
+		}
 	}
 
 	return 0;
