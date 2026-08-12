@@ -58,6 +58,13 @@ public:
 	AuCtx();
 	~AuCtx();
 
+	// MP3 streaming buffer management constants (issue #8672)
+	// These control how much data is buffered before playback starts and during streaming.
+	// Smaller values reduce startup delay (especially on track changes), larger values provide more resilience.
+	static constexpr int STREAMING_CHUNK_MIN_SPACE = 2048;     // Minimum free space before stopping requests
+	static constexpr int STREAMING_CHUNK_INITIAL = 8192;       // Initial/startup chunk size (~20 MP3 frames)
+	static constexpr int STREAMING_CHUNK_ONGOING = 4096;       // Ongoing streaming chunk size (~10 MP3 frames)
+
 	u32 AuDecode(u32 pcmAddr);
 
 	u32 AuNotifyAddStreamData(int size);

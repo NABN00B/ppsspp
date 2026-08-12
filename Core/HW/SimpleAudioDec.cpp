@@ -579,9 +579,25 @@ int AuCtx::AuStreamBytesNeeded() {
 		// The endPos and readPos are not considered, except when you've read to the end.
 		if (readPos >= endPos)
 			return 0;
-		// Account for the workarea.
+		
+		// For streaming (especially track changes), we should start playback as soon as
+		// we have a minimum amount of buffered data, not wait for the entire buffer to fill.
+		// This prevents the ~1 minute delay on track changes (issue #8672).
 		int offset = AuStreamWorkareaSize();
-		return (int)AuBufSize - AuBufAvailable - offset;
+		int spaceFree = (int)AuBufSize - AuBufAvailable;
+		
+		// If we don't have enough space for a reasonable amount of data, don't ask for more
+		if (spaceFree < STREAMING_CHUNK_MIN_SPACE)
+			return 0;
+		
+		// For initial startup or low buffer situations, ask for a modest chunk to avoid
+		// the "pre-fill entire buffer" behavior, while still maintaining good buffering
+		if (AuBufAvailable < offset + STREAMING_CHUNK_INITIAL) {
+			return std::min(STREAMING_CHUNK_INITIAL, spaceFree);
+		}
+		
+		// Once we have a decent buffer, keep asking for small amounts to top it off
+		return std::min(STREAMING_CHUNK_ONGOING, spaceFree);
 	}
 
 	// TODO: Untested.  Maybe similar to MP3.
