@@ -577,13 +577,14 @@ int AuCtx::AuStreamBytesNeeded() {
 
         // For streaming (especially track changes), we should start playback as soon as
         // we have a minimum amount of buffered data, not wait for the entire buffer to fill.
-		int offset = AuStreamWorkareaSize();
-        int spaceFree = (int)AuBufSize - AuBufAvailable;
-		int requestedSize = 0;
+		int spaceFree = (int)AuBufSize - AuBufAvailable;
 
         // If we don't have enough space for a reasonable amount of data, don't ask for more.
-        //if (spaceFree < MP3_STREAMING_CHUNK_MIN_SPACE)
-        //    return 0;
+        if (spaceFree < MP3_STREAMING_CHUNK_MIN_SPACE)
+            return 0;
+
+		int offset = AuStreamWorkareaSize();
+		int requestedSize = 0;
 
         // For initial startup or low buffer situations, ask for a modest chunk to avoid
         // the "pre-fill entire buffer" behavior, while still maintaining good buffering.
