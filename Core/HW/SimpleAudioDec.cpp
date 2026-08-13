@@ -535,9 +535,11 @@ u32 AuCtx::AuDecode(u32 pcmAddr) {
 
 	bool end = readPos - AuBufAvailable >= (int64_t)endPos;
 	if (end && LoopNum != 0) {
-		// When looping, start the sum back off at zero and reset readPos to the start.
+		// When looping, reset to the start position and clear stale buffer data.
 		SumDecodedSamples = 0;
 		readPos = startPos;
+		AuBufAvailable = 0;
+		sourcebuff.clear();
 		if (LoopNum > 0)
 			LoopNum--;
 	}
