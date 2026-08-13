@@ -580,7 +580,7 @@ int AuCtx::AuStreamBytesNeeded() {
 		int spaceFree = (int)AuBufSize - AuBufAvailable;
 
         // If we don't have enough space for a reasonable amount of data, don't ask for more.
-        if (spaceFree < MP3_STREAMING_CHUNK_MIN_SPACE)
+        if (spaceFree < MP3_STREAMING_MIN_SPACE)
             return 0;
 
 		int offset = AuStreamWorkareaSize();
