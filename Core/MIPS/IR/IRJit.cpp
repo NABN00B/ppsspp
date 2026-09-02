@@ -172,15 +172,15 @@ void IRJit::RunLoopUntil(u64 globalticks) {
 	// ApplyRoundingMode(true);
 	// IR Dispatcher
 	
+	MIPSState *mips = mips_;
 	while (true) {
 		// RestoreRoundingMode(true);
-		CoreTiming::Advance();
+		CoreTiming::Advance(currentMIPS);
 		// ApplyRoundingMode(true);
 		if (coreState != 0) {
 			break;
 		}
 
-		MIPSState *mips = mips_;
 #ifdef _DEBUG
 		compilerEnabled_ = false;
 #endif

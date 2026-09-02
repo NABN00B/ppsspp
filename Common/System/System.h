@@ -46,7 +46,6 @@ enum {
 
 enum class LaunchUrlType {
 	BROWSER_URL,
-	MARKET_URL,
 	EMAIL_ADDRESS,
 	LOCAL_FILE,
 	LOCAL_FOLDER,  // Shows the folder. Not supported on all systems of course.
@@ -154,6 +153,8 @@ enum SystemProperty {
 	
 	SYSPROP_CAN_GET_FREE_SPACE_FAST,
 
+	SYSPROP_IS_HEADLESS,
+
 	SYSPROP_HAS_FILE_BROWSER,
 	SYSPROP_HAS_FOLDER_BROWSER,
 	SYSPROP_HAS_IMAGE_BROWSER,
@@ -217,8 +218,6 @@ enum SystemProperty {
 	SYSPROP_HAS_DEBUGGER,
 
 	SYSPROP_KEYBOARD_LAYOUT,
-
-	SYSPROP_SKIP_UI,
 
 	SYSPROP_USER_DOCUMENTS_DIR,
 

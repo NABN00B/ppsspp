@@ -20,8 +20,41 @@
 #include "Common/MachineContext.h"
 #include "Common/ExceptionHandlerSetup.h"
 
+#if defined(_MSC_VER)
+#include <crtdbg.h>
+#include "Common/CommonWindows.h"
+#endif
+
 static BadAccessHandler g_badAccessHandler;
 static void *altStack = nullptr;
+
+void SetupCRT(bool suppressDialogs) {
+#if defined(_MSC_VER)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	if (suppressDialogs) {
+		// 1. Redirect CRT assertions/errors/warnings to stderr.
+		const _HFILE reportTarget = _CRTDBG_FILE_STDERR;
+
+		_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_ASSERT, reportTarget);
+
+		_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_ERROR, reportTarget);
+
+		_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+		_CrtSetReportFile(_CRT_WARN, reportTarget);
+
+		// 2. Suppress the abort() message box & crash reporting dialogs.
+		_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+
+#if !PPSSPP_PLATFORM(UWP)
+		// 3. Suppress Windows OS-level "Program has stopped working" modal dialogs.
+		SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+#endif
+	}
+#endif
+}
 
 #ifdef MACHINE_CONTEXT_SUPPORTED
 
@@ -279,6 +312,28 @@ static struct sigaction old_sa_bus;
 static stack_t old_signal_stack{};
 static bool old_signal_stack_valid = false;
 
+// Hand the signal on to whatever was installed before us. Returning from a fault handler just
+// re-runs the faulting instruction, so for anything we can't deal with this is the only exit
+// that isn't an infinite loop.
+static void ChainToPreviousHandler(int sig, siginfo_t *info, void *raw_context) {
+	struct sigaction *old_sa = sig == SIGSEGV ? &old_sa_segv : &old_sa_bus;
+	// Per the sigaction man page: with SA_SIGINFO it's sa_sigaction, otherwise sa_handler is
+	// SIG_DFL, SIG_IGN, or a handler pointer.
+	if (old_sa->sa_flags & SA_SIGINFO) {
+		old_sa->sa_sigaction(sig, info, raw_context);
+		return;
+	}
+	if (old_sa->sa_handler == SIG_DFL) {
+		signal(sig, SIG_DFL);
+		return;
+	}
+	if (old_sa->sa_handler == SIG_IGN) {
+		// Ignore signal
+		return;
+	}
+	old_sa->sa_handler(sig);
+}
+
 static void sigsegv_handler(int sig, siginfo_t* info, void* raw_context) {
 	if (sig != SIGSEGV && sig != SIGBUS) {
 		// We are not interested in other signals - handle it as usual.
@@ -287,7 +342,11 @@ static void sigsegv_handler(int sig, siginfo_t* info, void* raw_context) {
 	ucontext_t* context = (ucontext_t*)raw_context;
 	int sicode = info->si_code;
 	if (sicode != SEGV_MAPERR && sicode != SEGV_ACCERR) {
-		// Huh? Return.
+		// Not an address fault we can do anything with - an MTE, protection-key or shadow
+		// stack fault, or a signal sent with kill(). Returning here would re-run the
+		// faulting instruction forever at 100% CPU, and would also swallow the signal from
+		// whatever was installed before us (a crash reporter, say).
+		ChainToPreviousHandler(sig, info, raw_context);
 		return;
 	}
 	uintptr_t bad_address = (uintptr_t)info->si_addr;
@@ -313,26 +372,7 @@ static void sigsegv_handler(int sig, siginfo_t* info, void* raw_context) {
 		// SIG_IGN: The signal is ignored
 		// Any other value is a function pointer to a signal handler
 
-		struct sigaction* old_sa;
-		if (sig == SIGSEGV) {
-			old_sa = &old_sa_segv;
-		} else {
-			old_sa = &old_sa_bus;
-		}
-
-		if (old_sa->sa_flags & SA_SIGINFO) {
-			old_sa->sa_sigaction(sig, info, raw_context);
-			return;
-		}
-		if (old_sa->sa_handler == SIG_DFL) {
-			signal(sig, SIG_DFL);
-			return;
-		}
-		if (old_sa->sa_handler == SIG_IGN) {
-			// Ignore signal
-			return;
-		}
-		old_sa->sa_handler(sig);
+		ChainToPreviousHandler(sig, info, raw_context);
 	}
 }
 

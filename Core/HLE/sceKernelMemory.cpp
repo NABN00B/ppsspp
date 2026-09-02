@@ -1663,7 +1663,7 @@ static u32 sceKernelGetMemoryBlockAddr(u32 uid, u32 addr) {
 	PartitionMemoryBlock *block = kernelObjects.Get<PartitionMemoryBlock>(uid, error);
 	if (block) {
 		Memory::WriteOrException_U32(block->address, addr);
-		return hleLogInfo(Log::sceKernel, 0, "block address: %08x", block->address);
+		return hleLogDebug(Log::sceKernel, 0, "block address: %08x", block->address);
 	} else {
 		return hleLogError(Log::sceKernel, 0, "failed");
 	}
@@ -1675,9 +1675,10 @@ static u32 SysMemUserForUser_D8DE5C1E() {
 	return hleLogError(Log::sceKernel, 0, "UNIMPL");
 }
 
-static u32 SysMemUserForUser_ACBD88CA() {
-	ERROR_LOG_REPORT_ONCE(SysMemUserForUser_ACBD88CA, Log::sceKernel, "UNIMPL SysMemUserForUser_ACBD88CA()");
-	return hleNoLog(0);
+// Real name per uofw's src/kd/sysmem/exports.exp: sceKernelTotalMemSize - the total size (not
+// free size, see sceKernelMaxFreeMemSize above) of the user memory partition.
+static u32 sceKernelTotalMemSize() {
+	return hleLogDebug(Log::sceKernel, PSP_GetUserMemoryEnd() - PSP_GetUserMemoryBase());
 }
 
 static u32 SysMemUserForUser_945E45DA() {
@@ -2113,7 +2114,7 @@ const HLEFunction SysMemUserForUser[] = {
 	{0X358CA1BB, &WrapI_I<sceKernelSetCompiledSdkVersion606>,     "sceKernelSetCompiledSdkVersion606",     'i', "i"    },
 	{0XFC114573, &WrapI_V<sceKernelGetCompiledSdkVersion>,        "sceKernelGetCompiledSdkVersion",        'i', ""     },
 	{0X2A3E5280, nullptr,                                         "sceKernelQueryMemoryInfo",              '?', ""     },
-	{0XACBD88CA, &WrapU_V<SysMemUserForUser_ACBD88CA>,            "SysMemUserForUser_ACBD88CA",            'x', ""     },
+	{0XACBD88CA, &WrapU_V<sceKernelTotalMemSize>,                 "sceKernelTotalMemSize",                 'x', ""     },
 	{0X945E45DA, &WrapU_V<SysMemUserForUser_945E45DA>,            "SysMemUserForUser_945E45DA",            'x', ""     },
 	{0XA6848DF8, nullptr,                                         "sceKernelSetUsersystemLibWork",         '?', ""     },
 	{0X6231A71D, nullptr,                                         "sceKernelSetPTRIG",                     '?', ""     },

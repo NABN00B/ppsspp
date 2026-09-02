@@ -581,7 +581,7 @@ void Arm64Jit::Comp_Generic(MIPSOpcode op) {
 		MOVI2R(SCRATCH1, GetCompilerPC());
 		MovToPC(SCRATCH1);
 		MOVI2R(W0, op.encoding);
-		QuickCallFunction(SCRATCH2_64, (void *)func);
+		QuickCallFunction(SCRATCH2_64, (void *)&MIPSInterpretTrampoline);
 		ApplyRoundingMode();
 		LoadStaticRegisters();
 	}
@@ -708,7 +708,7 @@ void Arm64Jit::WriteSyscallExit() {
 }
 
 bool Arm64Jit::CheckJitBreakpoint(u32 addr, int downcountOffset) {
-	if (g_breakpoints.IsAddressBreakPoint(addr)) {
+	if (g_breakpoints.NeedsBreakCheckAt(addr)) {
 		MRS(FLAGTEMPREG, FIELD_NZCV);
 		FlushAll();
 		MOVI2R(SCRATCH1, GetCompilerPC());

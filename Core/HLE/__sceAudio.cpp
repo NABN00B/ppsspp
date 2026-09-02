@@ -259,7 +259,7 @@ u32 __AudioEnqueue(AudioChannel &chan, int chanNum, bool blocking) {
 		if (chan.format == PSP_AUDIO_FORMAT_STEREO) {
 			const u32 totalSamples = chan.sampleCount * 2;
 
-			s16_le *sampleData = (s16_le *) Memory::GetPointer(chan.sampleAddress);
+			s16_le *sampleData = (s16_le *) Memory::GetPointerOrException(chan.sampleAddress);
 
 			// Walking a pointer for speed.  But let's make sure we wouldn't trip on an invalid ptr.
 			if (Memory::IsValidAddress(chan.sampleAddress + (totalSamples - 1) * sizeof(s16_le))) {
@@ -477,8 +477,15 @@ void __AudioUpdate(bool resetRecording) {
 #ifndef MOBILE_DEVICE
 void __StartLogAudio(const Path& filename) {
 	if (!m_logAudio) {
+		if (!g_wave_writer.Start(filename, 44100)) {
+			// Start() logs the reason. Leave m_logAudio false, or every mixed block from here on
+			// would hand samples to a closed file - and turn the setting off too, since otherwise
+			// the caller below retries this (creating the file, opening it) once per block.
+			ERROR_LOG(Log::sceAudio, "Failed to start audio logging, disabling it");
+			g_Config.bDumpAudio = false;
+			return;
+		}
 		m_logAudio = true;
-		g_wave_writer.Start(filename, 44100);
 		g_wave_writer.SetSkipSilence(false);
 		NOTICE_LOG(Log::sceAudio, "Starting Audio logging");
 	} else {

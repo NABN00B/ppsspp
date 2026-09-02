@@ -26,12 +26,15 @@
 #include "Common/Serialize/Serializer.h"
 #include "Common/Serialize/SerializeFuncs.h"
 #include "Common/Thread/ThreadUtil.h"
+#include "Common/Data/Text/StringWriter.h"
 #include "Core/Config.h"
 #include "Core/CoreTiming.h"
 #include "Core/Debugger/Breakpoints.h"
 #include "Core/Debugger/MemBlockInfo.h"
+#include "Core/HLE/sceKernelModule.h"  // for DescribeAddress
 #include "Core/MIPS/MIPS.h"
 #include "Common/StringUtils.h"
+#include "Core/Debugger/SymbolMap.h"
 
 class MemSlabMap {
 public:
@@ -501,7 +504,7 @@ void NotifyMemInfoPC(MemBlockFlags flags, uint32_t start, uint32_t size, uint32_
 	// When the setting is off, we skip smaller info to keep things fast.
 	if (MemBlockInfoDetailed(size) && flags != MemBlockFlags::READ) {
 		PendingNotifyMem info{ flags, start, size };
-		info.ticks = CoreTiming::GetTicks();
+		info.ticks = CoreTiming::GetTicks(currentMIPS);
 		info.pc = pc;
 
 		size_t copyLength = strLength;
@@ -565,7 +568,7 @@ void NotifyMemInfoCopy(uint32_t destPtr, uint32_t srcPtr, uint32_t size, const c
 
 		PendingNotifyMem info{ MemBlockFlags::WRITE, destPtr, size };
 		info.copySrc = srcPtr;
-		info.ticks = CoreTiming::GetTicks();
+		info.ticks = CoreTiming::GetTicks(currentMIPS);
 		info.pc = currentMIPS->pc;
 
 		// Store the prefix for now.  The correct tag will be calculated on flush.
@@ -781,4 +784,35 @@ void MemBlockReleaseDetailed() {
 
 bool MemBlockInfoDetailed() {
 	return g_Config.bDebugMemInfoDetailed || detailedOverride != 0;
+}
+
+void DescribeAddress(const MIPSDebugInterface *mips, u32 address, char *buffer, size_t bufferSize) {
+	StringWriter w(buffer, bufferSize);
+	const char *kernel = (address & 0x80000000) ? " (kernel)" : "";
+	const char *uncached = (address & 0x40000000) ? " (uncached)" : "";
+	char desc[512];
+	if (!Memory::IsValidAddress(address)) {
+		if (address == 0xdeadbeef) {
+			w.C("(deadbeef)");
+		} else {
+			w.C("(invalid)");
+		}
+	} else if (DescribeModuleAddress(address, desc, sizeof(desc))) {
+		std::string temp = g_symbolMap->GetDescription(address);
+		w.F("[%s]%s%s: %s", desc, kernel, uncached, temp.c_str());
+	} else if (Memory::IsVRAMAddress(address)) {
+		w.F("[VRAM]%s", uncached);  // can't be kernel
+	} else if (Memory::IsScratchpadAddress(address)) {
+		w.F("[SCRATCH]%s%s", kernel, uncached);
+	} else {
+		// Look up in the memory tracker.
+		w.F("[RAM]%s%s ", kernel, uncached);
+		const std::vector<MemBlockInfo> memInfo = FindMemInfo(address, 4);
+		for (const auto &info : memInfo) {
+			w.F("%s, ", info.tag.c_str());
+		}
+		if (!memInfo.empty()) {
+			w.Rewind(2);  // Remove the last comma
+		}
+	}
 }

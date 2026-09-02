@@ -144,7 +144,6 @@ void System_LaunchUrl(LaunchUrlType urlType, std::string_view url) {
 	case LaunchUrlType::BROWSER_URL:
 	case LaunchUrlType::LOCAL_FILE:
 	case LaunchUrlType::LOCAL_FOLDER:
-	case LaunchUrlType::MARKET_URL:
 	case LaunchUrlType::EMAIL_ADDRESS:
 		// ShellExecute handles everything.
 	{
@@ -927,12 +926,10 @@ std::vector<std::wstring> GetWideCmdLine() {
 }
 
 static void InitMemstickDirectory() {
-	if (!g_Config.memStickDirectory.empty() && !g_Config.flash0Directory.empty())
+	if (!g_Config.memStickDirectory.empty() && !g_Config.nandRootDirectory.empty())
 		return;
 
 	const Path &exePath = File::GetExeDirectory();
-	// Mount a filesystem
-	g_Config.flash0Directory = exePath / "assets/flash0";
 
 	// Caller sets this to the Documents folder.
 	const Path rootMyDocsPath = g_Config.internalDataDirectory;
@@ -1253,8 +1250,8 @@ int WINAPI WinMain(HINSTANCE _hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLin
 			[](GraphicsContext *graphicsContext) {
 				NativeFrame(graphicsContext);
 				return GetUIState() != UISTATE_EXIT;
-		})) {
-			HandleGraphicsFailure("Failed to initialize main thread function.");
+		}, &errorMessage)) {
+			HandleGraphicsFailure(errorMessage);
 			return;
 		}
 		graphicsContext->ShutdownAPI();

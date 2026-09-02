@@ -303,24 +303,25 @@ void hleCheat(u64 userdata, int cyclesLate) {
 		// Horrible hack for Tony Hawk - Underground 2. See #3854. Avoids crashing somehow
 		// but still causes regular JIT invalidations which causes stutters.
 		if (gameTitle == "ULUS10014") {
-			currentMIPS->InvalidateICache(0x08865600, 72);
-			currentMIPS->InvalidateICache(0x08865690, 4);
+			currentMIPS->InvalidateICacheRangeDeferred(0x08865600, 72);
+			currentMIPS->InvalidateICacheRangeDeferred(0x08865690, 4);
 		} else if (gameTitle == "ULES00033" || gameTitle == "ULES00034" || gameTitle == "ULES00035") {  // euro, also 34 and 35
-			currentMIPS->InvalidateICache(0x088655D8, 72);
-			currentMIPS->InvalidateICache(0x08865668, 4);
+			currentMIPS->InvalidateICacheRangeDeferred(0x088655D8, 72);
+			currentMIPS->InvalidateICacheRangeDeferred(0x08865668, 4);
 		} else if (gameTitle == "ULUS10138") {  // MTX MotoTrax US
-			currentMIPS->InvalidateICache(0x0886DCC0, 72);
-			currentMIPS->InvalidateICache(0x0886DC20, 4);
-			currentMIPS->InvalidateICache(0x0886DD40, 4);
+			currentMIPS->InvalidateICacheRangeDeferred(0x0886DCC0, 72);
+			currentMIPS->InvalidateICacheRangeDeferred(0x0886DC20, 4);
+			currentMIPS->InvalidateICacheRangeDeferred(0x0886DD40, 4);
 		} else if (gameTitle == "ULES00581") {  // MTX MotoTrax EU (ported from US cwcheat codes)
-			currentMIPS->InvalidateICache(0x0886E1D8, 72);
-			currentMIPS->InvalidateICache(0x0886E138, 4);
-			currentMIPS->InvalidateICache(0x0886E258, 4);
+			currentMIPS->InvalidateICacheRangeDeferred(0x0886E1D8, 72);
+			currentMIPS->InvalidateICacheRangeDeferred(0x0886E138, 4);
+			currentMIPS->InvalidateICacheRangeDeferred(0x0886E258, 4);
 		}
 	}
 
-	if (!cheatEngine || !cheatsEnabled)
+	if (!cheatEngine || !cheatsEnabled) {
 		return;
+	}
 
 	if (g_Config.bReloadCheats) {  // Checks if the "reload cheats" button has been pressed.
 		cheatEngine->ParseCheats();
@@ -371,7 +372,7 @@ void CWCheatEngine::InvalidateICache(u32 addr, int size) const {
 	// Round start down and size up to the nearest word.
 	u32 aligned = addr & ~3;
 	int alignedSize = (addr + size - aligned + 3) & ~3;
-	currentMIPS->InvalidateICache(aligned, alignedSize);
+	currentMIPS->InvalidateICacheRangeDeferred(aligned, alignedSize);
 }
 
 enum class CheatOp {
@@ -776,7 +777,7 @@ bool CWCheatEngine::TestIf(const CheatOperation &op, bool(*oper)(int, int)) cons
 bool CWCheatEngine::TestIfAddr(const CheatOperation &op, bool(*oper)(int, int)) const {
 	if (Memory::IsValidRange(op.addr, op.sz) && Memory::IsValidRange(op.ifAddrTypes.compareAddr, op.sz)) {
 		InvalidateICache(op.addr, op.sz);  // See note at top of file
-		InvalidateICache(op.addr, op.ifAddrTypes.compareAddr);
+		InvalidateICache(op.ifAddrTypes.compareAddr, op.sz);
 
 		int memoryValue1 = 0;
 		int memoryValue2 = 0;
@@ -848,13 +849,16 @@ void CWCheatEngine::ExecuteOp(const CheatOperation &op, const CheatCode &cheat, 
 		break;
 
 	case CheatOp::MultiWrite:
-		if (Memory::IsValidAddress(op.addr)) {
+	{
+		u64 range = (u64)op.multiWrite.count * (u64)op.multiWrite.step + op.sz;
+		if (range < 24 * 1024 * 1024 && Memory::IsValidRange(op.addr, op.multiWrite.count * op.multiWrite.step + op.sz)) {
 			InvalidateICache(op.addr, op.multiWrite.count * op.multiWrite.step + op.sz);
 
 			uint32_t data = op.val;
 			uint32_t addr = op.addr;
+			// TODO: Can coalesce the range check.
 			for (uint32_t a = 0; a < op.multiWrite.count; a++) {
-				if (Memory::IsValidAddress(addr)) {
+				if (Memory::IsValidRange(addr, op.sz)) {
 					if (op.sz == 1)
 						Memory::WriteUnchecked_U8((u8)data, addr);
 					else if (op.sz == 2)
@@ -867,7 +871,7 @@ void CWCheatEngine::ExecuteOp(const CheatOperation &op, const CheatCode &cheat, 
 			}
 		}
 		break;
-
+	}
 	case CheatOp::CopyBytesFrom:
 		if (Memory::IsValidRange(op.addr, op.val) && Memory::IsValidRange(op.copyBytesFrom.destAddr, op.val)) {
 			InvalidateICache(op.addr, op.val);  // See note at top of file
@@ -1037,7 +1041,7 @@ void CWCheatEngine::ExecuteOp(const CheatOperation &op, const CheatCode &cheat, 
 
 	case CheatOp::CwCheatPointerCommands:
 		{
-			if (!Memory::IsValidAddress(op.addr + op.pointerCommands.baseOffset)) {
+			if (!Memory::IsValidRange(op.addr + op.pointerCommands.baseOffset, 4)) {
 				break;
 			}
 			InvalidateICache(op.addr + op.pointerCommands.baseOffset, 4);  // See note at top of file
@@ -1113,13 +1117,13 @@ void CWCheatEngine::ExecuteOp(const CheatOperation &op, const CheatCode &cheat, 
 				}
 				break;
 			case 1: // 16-bit write
-				if (Memory::IsValidAddress(base + op.pointerCommands.offset)) {
+				if (Memory::IsValidRange(base + op.pointerCommands.offset, 2)) {
 					InvalidateICache(base + op.pointerCommands.offset, 2);
 					Memory::WriteUnchecked_U16((u16)val, base + op.pointerCommands.offset);
 				}
 				break;
 			case 2: // 32-bit write
-				if (Memory::IsValidAddress(base + op.pointerCommands.offset)) {
+				if (Memory::IsValidRange(base + op.pointerCommands.offset, 4)) {
 					InvalidateICache(base + op.pointerCommands.offset, 4);
 					Memory::WriteUnchecked_U32((u32)val, base + op.pointerCommands.offset);
 				}
@@ -1131,13 +1135,13 @@ void CWCheatEngine::ExecuteOp(const CheatOperation &op, const CheatCode &cheat, 
 				}
 				break;
 			case 4: // 16-bit inverse write
-				if (Memory::IsValidAddress(base - op.pointerCommands.offset)) {
+				if (Memory::IsValidRange(base - op.pointerCommands.offset, 2)) {
 					InvalidateICache(base - op.pointerCommands.offset, 2);
 					Memory::WriteUnchecked_U16((u16)val, base - op.pointerCommands.offset);
 				}
 				break;
 			case 5: // 32-bit inverse write
-				if (Memory::IsValidAddress(base - op.pointerCommands.offset)) {
+				if (Memory::IsValidRange(base - op.pointerCommands.offset, 4)) {
 					InvalidateICache(base - op.pointerCommands.offset, 4);
 					Memory::WriteUnchecked_U32((u32)val, base - op.pointerCommands.offset);
 				}

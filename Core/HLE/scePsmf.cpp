@@ -770,7 +770,7 @@ static u32 scePsmfSetPsmf(u32 psmfStruct, u32 psmfData) {
 		return hleReportError(Log::ME, SCE_KERNEL_ERROR_ILLEGAL_ADDRESS, "bad address");
 	}
 
-	Psmf *psmf = new Psmf(Memory::GetPointer(psmfData), psmfData);
+	Psmf *psmf = new Psmf(Memory::GetPointerOrException(psmfData), psmfData);
 	if (psmf->magic != PSMF_MAGIC) {
 		delete psmf;
 		return hleLogError(Log::ME, SCE_PSMF_ERROR_INVALID_PSMF, "invalid psmf data");
@@ -1243,8 +1243,12 @@ static int _PsmfPlayerSetPsmfOffset(u32 psmfPlayer, const char *filename, int of
 		return hleDelayResult(hleLogError(Log::ME, SCE_KERNEL_ERROR_ILLEGAL_ARGUMENT, "invalid file data or does not exist"), "psmfplayer set", delayUs);
 	}
 
-	if (offset != 0)
-		pspFileSystem.SeekFile(psmfplayer->filehandle, offset, FILEMOVE_BEGIN);
+	if (offset < 0) {
+		return hleDelayResult(hleLogError(Log::ME, SCE_KERNEL_ERROR_ILLEGAL_ARGUMENT, "invalid file data or does not exist"), "psmfplayer set", delayUs);
+	}
+
+	pspFileSystem.SeekFile(psmfplayer->filehandle, offset, FILEMOVE_BEGIN);
+
 	u8 *buf = psmfplayer->tempbuf;
 	int tempbufSize = (int)sizeof(psmfplayer->tempbuf);
 	int size = (int)pspFileSystem.ReadFile(psmfplayer->filehandle, buf, 2048);

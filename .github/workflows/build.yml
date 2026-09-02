@@ -113,7 +113,7 @@ jobs:
         Compress-Archive -Path "ppsspp/*" -Update -DestinationPath "releases/PPSSPP-${{ github.ref_name }}-Windows-${{ matrix.platform }}.zip"
 
     - name: Upload release
-      uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+      uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
       if: github.ref_type == 'tag'
       with:
         files: releases/*.zip
@@ -135,6 +135,52 @@ jobs:
     - name: Build UWP
       working-directory: ${{ env.GITHUB_WORKSPACE }}
       run: msbuild /m /p:TrackFileAccess=false /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform=x64 /p:AppxPackageSigningEnabled=false UWP/PPSSPP_UWP.sln
+
+  # Mirrors the two Windows jobs in libretro's own GitLab CI (see .gitlab-ci.yml). The libretro core
+  # is built by GNU make driving cl.exe/link.exe from an MSYS2 shell, not by the VS solution, so it
+  # catches MSVC-specific errors that neither build-windows nor the Linux/Android libretro builds do
+  # - duplicate symbols in particular, since MSVC emits inline functions that gcc/clang inline away.
+  build-libretro-windows:
+    name: build-libretro-windows (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - arch: x64
+          platform: windows_msvc2019_desktop_x64
+          msystem: MINGW64
+        - arch: x86
+          platform: windows_msvc2019_desktop_x86
+          msystem: MINGW32
+
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        submodules: recursive
+
+    # Needs a real MSYS2 (make, bash, cygpath) - the one preinstalled on the runner image isn't on
+    # PATH and has no make. path-type: inherit keeps the Windows PATH, which the Makefile needs for
+    # reg.exe (Windows SDK lookup) and git.
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
+      with:
+        msystem: ${{ matrix.msystem }}
+        path-type: inherit
+        install: make
+
+    # The Makefile can locate Visual Studio by itself, but only through "cmd //c bash VSWhere.sh",
+    # which depends on COMSPEC and ProgramFiles(x86) surviving into the MSYS2 shell. Resolving it
+    # here and passing VsInstallRoot= on the command line (a command-line variable overrides the
+    # Makefile's own := assignment) fails loudly rather than silently misconfiguring the build.
+    - name: Build libretro core
+      shell: msys2 {0}
+      run: |
+        VS_PATH=$(sh libretro/VSWhere.sh -latest -property installationPath)
+        test -n "$VS_PATH" || { echo "vswhere found no Visual Studio installation"; exit 1; }
+        echo "Visual Studio: $VS_PATH"
+        make -C libretro -f Makefile -j4 platform=${{ matrix.platform }} VsInstallRoot="$(cygpath -u "$VS_PATH")"
 
   test-windows:
     runs-on: windows-latest
@@ -275,7 +321,7 @@ jobs:
       if: runner.os == 'Linux' && matrix.extra != 'android' && matrix.extra != 'loongarch64'
       run: |
         sudo apt-get update -y -qq
-        sudo apt-get install libsdl3-dev libgl1-mesa-dev libglu1-mesa-dev libsdl3-ttf-dev libfontconfig1-dev
+        sudo apt-get install libsdl3-dev libgl1-mesa-dev libglu1-mesa-dev libsdl3-ttf-dev libfontconfig1-dev libcurl4-openssl-dev
 
     - name: Install macOS SDL3 dependencies
       if: runner.os == 'macOS' && matrix.id == 'macos'
@@ -392,7 +438,7 @@ jobs:
       run: mv PPSSPPSDL.zip PPSSPPSDL-macOS-${GITHUB_REF_NAME}.zip
 
     - name: Upload macOS & iOS release
-      uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+      uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
       if: github.ref_type == 'tag' && (matrix.id == 'macos' || matrix.id == 'ios')
       with:
         files: |
@@ -429,7 +475,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update -y -qq
-        sudo apt-get install libsdl3-dev libgl1-mesa-dev libglu1-mesa-dev libsdl3-ttf-dev libfontconfig1-dev
+        sudo apt-get install libsdl3-dev libgl1-mesa-dev libglu1-mesa-dev libsdl3-ttf-dev libfontconfig1-dev libcurl4-openssl-dev
 
     - name: Install macOS dependencies
       if: runner.os == 'macOS'
@@ -478,7 +524,7 @@ jobs:
     steps:
     - name: Install Linux dependencies (Alpine)
       run: |
-        apk add build-base wget git bash cmake python3 glu-dev sdl3-dev sdl3_ttf-dev
+        apk add build-base wget git bash cmake python3 glu-dev sdl3-dev sdl3_ttf-dev curl-dev
 
     - uses: actions/checkout@v7
       with:

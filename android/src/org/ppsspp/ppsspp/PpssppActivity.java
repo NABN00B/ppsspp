@@ -1487,6 +1487,9 @@ public class PpssppActivity extends AppCompatActivity implements SensorEventList
 					return false;
 				}
 			} else {
+				// Don't need a separate launchMarket, can just use launchBrowser with a market:
+				// http://stackoverflow.com/questions/3442366/android-link-to-market-from-inside-another-app
+				// http://developer.android.com/guide/publishing/publishing.html#marketintent
 				try {
 					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(params));
 					startActivity(i);
@@ -1591,11 +1594,6 @@ public class PpssppActivity extends AppCompatActivity implements SensorEventList
 				Log.e(TAG, e.toString());
 				return false;
 			}
-		} else if (command.equals("launchMarket")) {
-			// Don't need this, can just use launchBrowser with a market:
-			// http://stackoverflow.com/questions/3442366/android-link-to-market-from-inside-another-app
-			// http://developer.android.com/guide/publishing/publishing.html#marketintent
-			return false;
 		} else if (command.equals("toast")) {
 			Toast toast = Toast.makeText(this, params, Toast.LENGTH_LONG);
 			toast.show();
@@ -1603,8 +1601,6 @@ public class PpssppActivity extends AppCompatActivity implements SensorEventList
 			return true;
 		} else if (command.equals("showKeyboard") && surfView != null) {
 			InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-			// No idea what the point of the ApplicationWindowToken is or if it
-			// matters where we get it from...
 			inputMethodManager.showSoftInput(surfView, InputMethodManager.SHOW_IMPLICIT);
 			return true;
 		} else if (command.equals("hideKeyboard") && surfView != null) {

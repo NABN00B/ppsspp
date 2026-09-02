@@ -16,6 +16,8 @@
 // https://github.com/hrydgard/ppsspp and http://www.ppsspp.org/.
 
 #include <algorithm>
+#include <atomic>
+#include <condition_variable>
 #include <mutex>
 #include <thread>
 #include <string_view>
@@ -55,7 +57,11 @@ static const int REPORT_PORT = 80;
 static std::thread serverThread;
 static ServerStatus serverStatus;
 static std::mutex serverStatusLock;
+static std::condition_variable serverStatusCond;
 static WebServerFlags serverFlags;
+// See WebServerSetRequireExactPort(). Atomic because it's set from whichever thread parsed the
+// command line, and read from the server thread.
+static std::atomic<bool> serverRequireExactPort;
 
 std::mutex g_webServerLock;
 static Path g_uploadPath;  // TODO: Supply this through registration instead.
@@ -83,8 +89,11 @@ std::string ServerUriDecode(std::string_view encoded) {
 }
 
 static void UpdateStatus(ServerStatus s) {
-	std::lock_guard<std::mutex> guard(serverStatusLock);
-	serverStatus = s;
+	{
+		std::lock_guard<std::mutex> guard(serverStatusLock);
+		serverStatus = s;
+	}
+	serverStatusCond.notify_all();
 }
 
 static ServerStatus RetrieveStatus() {
@@ -206,6 +215,16 @@ static Path LocalFromRemotePath(std::string_view path) {
 		return Path();
 	case RemoteISOShareType::LOCAL_FOLDER:
 	{
+		// Nothing stops the user from starting the server without ever picking a folder, and an empty
+		// base is NOT harmless here: Path("") / "/etc/passwd" is just Path("/etc/passwd"), since
+		// operator/ doesn't insert a separator when the component already starts with one. That would
+		// serve the entire filesystem to anyone who can reach the port, and none of the checks below
+		// would fire, because no traversal is needed to get there.
+		const Path sharedDir(g_Config.sRemoteISOSharedDir);
+		if (sharedDir.empty()) {
+			return Path();
+		}
+
 		std::string decoded = ServerUriDecode(path);
 
 		if (decoded.empty() || decoded.front() != '/') {
@@ -220,7 +239,14 @@ static Path LocalFromRemotePath(std::string_view path) {
 		if (decoded.find("/..") != std::string::npos) {
 			return Path();
 		}
-		return Path(g_Config.sRemoteISOSharedDir) / decoded;
+
+		// Belt and braces: whatever the path manipulation above ends up doing, the result has to stay
+		// inside the shared directory.
+		const Path localPath = sharedDir / decoded;
+		if (!localPath.StartsWith(sharedDir)) {
+			return Path();
+		}
+		return localPath;
 	}
 	default:
 		return Path();
@@ -307,6 +333,12 @@ static void HandleListing(const http::ServerRequest &request) {
 
 			std::string resource(request.resource());
 			Path localDir = LocalFromRemotePath(resource);
+			if (localDir.empty()) {
+				// Refused (not configured, or traversal attempt). Don't hand an empty path to
+				// GetFilesInDir - on Windows that turns into FindFirstFile("\\*"), i.e. a listing
+				// of the root of the current drive.
+				break;
+			}
 
 			File::GetFilesInDir(localDir, &entries);
 			for (const auto &entry : entries) {
@@ -642,6 +674,16 @@ static MultiPartResult HandleMultipartPart(const http::ServerRequest &request, s
 		}
 		progress.AddBytes(readBytes);
 		bytesTransferred += readBytes;
+		if (readBytes == 0 && !terminatorFound && (request.In()->AtEnd() || request.In()->HasError())) {
+			// Peer went away mid-upload (a cancelled browser upload, say). Without this the loop
+			// spins forever, which also blocks web server shutdown since it joins its threads.
+			ERROR_LOG(Log::HTTP, "Connection closed during upload of '%s'", filename.c_str());
+			if (fp) {
+				fclose(fp);
+				File::Delete(destPath);
+			}
+			return MultiPartResult::RequestError;
+		}
 		if (terminatorFound) {
 			INFO_LOG(Log::HTTP, "Found terminator, skipping and proceeding.");
 			break;
@@ -690,6 +732,14 @@ static void HandleUploadPost(const http::ServerRequest &request) {
 	// Do some sanity checks.
 	if (request.Method() != http::RequestHeader::POST) {
 		ERROR_LOG(Log::HTTP, "Wrong method");
+		return;
+	}
+
+	// This handler is registered unconditionally, so it has to check the flag itself - otherwise
+	// closing the Upload screen leaves an unauthenticated write endpoint live for as long as
+	// anything else (remote ISO, the debugger) keeps the server up.
+	if (!(serverFlags & WebServerFlags::FILE_UPLOAD)) {
+		ERROR_LOG(Log::HTTP, "Upload requested, but uploading isn't enabled");
 		return;
 	}
 
@@ -784,6 +834,19 @@ static void WebServerThread() {
 	http->RegisterHandler("/upload_file", &HandleUploadPost);
 
 	if (!http->Listen(g_Config.iRemoteISOPort, "debugger-webserver")) {
+		if (serverRequireExactPort) {
+			// Someone asked for this specific port (--debugger=PORT) - see
+			// WebServerSetRequireExactPort(). Coming up on a different one would just look like
+			// success while nothing can connect, so give up loudly instead.
+			ERROR_LOG(Log::FileSystem, "Unable to listen on port %d, and it was explicitly requested (debugger - webserver). Is another PPSSPP instance already using it?", g_Config.iRemoteISOPort);
+			// Headless treats this as fatal; the GUI app stays usable, so at least say why there's
+			// no debugger rather than leaving it a mystery.
+			if (serverFlags & WebServerFlags::DEBUGGER) {
+				g_OSD.Show(OSDType::MESSAGE_ERROR, "Debugger web server could not use port " + std::to_string(g_Config.iRemoteISOPort), 8.0f, "debugger");
+			}
+			UpdateStatus(ServerStatus::FINISHED);
+			return;
+		}
 		if (!http->Listen(0, "debugger-webserver")) {
 			ERROR_LOG(Log::FileSystem, "Unable to listen on any port (debugger - webserver)");
 			UpdateStatus(ServerStatus::FINISHED);
@@ -797,7 +860,9 @@ static void WebServerThread() {
 	RegisterServer(http->Port());
 	double lastRegister = time_now_d();
 
-	INFO_LOG(Log::HTTP, "Entering web server loop. Listening on port %d", g_Config.iRemoteISOPort);
+	// NOTICE rather than INFO on purpose: with --debugger=0 the port is picked for us, and this
+	// line is the only way a client can find out which one it got.
+	NOTICE_LOG(Log::HTTP, "Entering web server loop. Listening on port %d", g_Config.iRemoteISOPort);
 
 	if (serverFlags & WebServerFlags::DEBUGGER) {
 		g_OSD.Show(OSDType::MESSAGE_SUCCESS, "Debugger web server running on port " + std::to_string(g_Config.iRemoteISOPort), 5.0f, "debugger");
@@ -822,10 +887,17 @@ static void WebServerThread() {
 	delete http;
 
 	UpdateStatus(ServerStatus::FINISHED);
+	INFO_LOG(Log::HTTP, "Left web server loop.");
 }
 
 // Only adds flags.
 bool StartWebServer(WebServerFlags flags) {
+	if ((flags & WebServerFlags::DISCS) && (RemoteISOShareType)g_Config.iRemoteISOShareType == RemoteISOShareType::LOCAL_FOLDER && g_Config.sRemoteISOSharedDir.empty()) {
+		// Not fatal - LocalFromRemotePath refuses to resolve anything in this state, so the server just
+		// won't serve any files. Worth a log line so it doesn't look like a mysterious failure.
+		WARN_LOG(Log::Loader, "Remote ISO sharing is set to share a local folder, but no folder is set - nothing will be shared.");
+	}
+
 	std::lock_guard<std::mutex> guard(serverStatusLock);
 	switch (serverStatus) {
 	case ServerStatus::RUNNING:
@@ -892,4 +964,14 @@ bool WebServerRunning(WebServerFlags flags) {
 
 int WebServerPort() {
 	return g_Config.iRemoteISOPort;
+}
+
+void WebServerSetRequireExactPort(bool require) {
+	serverRequireExactPort = require;
+}
+
+bool WebServerWaitForStartup() {
+	std::unique_lock<std::mutex> guard(serverStatusLock);
+	serverStatusCond.wait(guard, [] { return serverStatus != ServerStatus::STARTING; });
+	return serverStatus == ServerStatus::RUNNING;
 }

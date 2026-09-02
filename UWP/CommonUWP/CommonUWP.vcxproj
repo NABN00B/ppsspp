@@ -125,6 +125,7 @@
     <ClInclude Include="..\..\Common\Data\Format\ZIMSave.h" />
     <ClInclude Include="..\..\Common\Data\Hash\Hash.h" />
     <ClInclude Include="..\..\Common\Data\Random\Rng.h" />
+    <ClInclude Include="..\..\Common\Data\Text\Demangle.h" />
     <ClInclude Include="..\..\Common\Data\Text\I18n.h" />
     <ClInclude Include="..\..\Common\Data\Text\Parsers.h" />
     <ClInclude Include="..\..\Common\Data\Text\WrapText.h" />
@@ -294,6 +295,7 @@
     <ClInclude Include="..\..\ext\minimp3\minimp3.h" />
     <ClInclude Include="..\..\ext\minimp3\minimp3_ex.h" />
     <ClInclude Include="..\..\ext\naett\naett.h" />
+    <ClInclude Include="..\..\ext\naett\src\naett_internal.h" />
     <ClInclude Include="..\..\ext\pugixml\pugiconfig.hpp" />
     <ClInclude Include="..\..\ext\pugixml\pugixml.hpp" />
     <ClInclude Include="targetver.h" />
@@ -327,6 +329,7 @@
     <ClCompile Include="..\..\Common\Data\Format\ZIMLoad.cpp" />
     <ClCompile Include="..\..\Common\Data\Format\ZIMSave.cpp" />
     <ClCompile Include="..\..\Common\Data\Hash\Hash.cpp" />
+    <ClCompile Include="..\..\Common\Data\Text\Demangle.cpp" />
     <ClCompile Include="..\..\Common\Data\Text\I18n.cpp" />
     <ClCompile Include="..\..\Common\Data\Text\Parsers.cpp" />
     <ClCompile Include="..\..\Common\Data\Text\WrapText.cpp" />
@@ -475,7 +478,8 @@
     <ClCompile Include="..\..\ext\lzma-sdk\Lzma2Dec.c" />
     <ClCompile Include="..\..\ext\lzma-sdk\LzmaDec.c" />
     <ClCompile Include="..\..\ext\minimp3\minimp3.cpp" />
-    <ClCompile Include="..\..\ext\naett\naett.c" />
+    <ClCompile Include="..\..\ext\naett\src\naett_core.c" />
+    <ClCompile Include="..\..\ext\naett\src\naett_win.c" />
     <ClCompile Include="..\..\ext\pugixml\pugixml.cpp" />
   </ItemGroup>
   <ItemGroup>

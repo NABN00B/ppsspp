@@ -271,7 +271,20 @@ if(ANDROID)
 	set(USING_GLES2 ON)
 endif()
 
-if(NOT ANDROID AND NOT WIN32 AND (NOT APPLE OR IOS))
+# naett wraps a native HTTPS implementation per platform: WinHTTP on Windows, the Java
+# APIs on Android, NSURLSession on macOS, and libcurl elsewhere.
+if(WIN32 OR ANDROID OR (APPLE AND NOT IOS))
+	# Nothing to do, these need no external library.
+elseif(UNIX AND NOT APPLE AND NOT LIBRETRO)
+	# We only need the curl headers at build time - libcurl itself is loaded with dlopen
+	# (see ext/naett/src/naett_curl.h), so it stays optional at runtime and a build made
+	# here still starts on a machine without it, just without HTTPS.
+	find_package(CURL)
+	if(NOT CURL_FOUND)
+		message(STATUS "libcurl headers not found - building without HTTPS support")
+		set(HTTPS_NOT_AVAILABLE ON)
+	endif()
+else()
 	set(HTTPS_NOT_AVAILABLE ON)
 endif()
 
@@ -539,7 +552,6 @@ endif()
 
 if(WIN32)
 	add_compile_definitions(_UNICODE UNICODE)
-	add_compile_definitions(USING_WIN_UI)
 endif()
 
 if(NOT ANDROID)
@@ -845,8 +857,8 @@ else()
 	set(LIBZIP_LIBRARY libzip)
 endif()
 
-# Arm platforms require at least libpng17.
-if(ANDROID OR ARMV7 OR ARM64 OR ARM OR IOS)
+# Android and iOS require at least libpng17.
+if(ANDROID OR IOS)
 	set(PNG_REQUIRED_VERSION 1.7)
 else()
 	set(PNG_REQUIRED_VERSION 1.6)
@@ -1354,6 +1366,7 @@ if(UNITTEST)
 		unittest/TestVFS.cpp
 		unittest/TestZipSlip.cpp
 		unittest/TestLzrc.cpp
+		unittest/TestDemangle.cpp
 		unittest/TestTextureReplacer.cpp
 		unittest/TestRiscVEmitter.cpp
 		unittest/TestLoongArch64Emitter.cpp
