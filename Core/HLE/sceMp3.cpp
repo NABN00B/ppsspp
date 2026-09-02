@@ -204,7 +204,7 @@ void __Mp3DoState(PointerWrap &p) {
 			mp3->MaxOutputSample = mp3_old->mp3MaxSamples;
 			mp3->SetReadPos(mp3_old->readPosition);
 
-			mp3->decoder = CreateAudioDecoder(PSP_CODEC_MP3);
+			mp3->decoder = CreateAudioDecoder(PSP_CODEC_MP3, mp3->SamplingRate > 0 ? mp3->SamplingRate : 44100, mp3->Channels > 0 ? mp3->Channels : 2);
 			g_mp3Map[id] = mp3;
 		}
 	}
@@ -295,6 +295,12 @@ static u32 sceMp3ReserveMp3Handle(u32 mp3Addr) {
 			delete Au;
 			return hleLogError(Log::ME, SCE_MP3_ERROR_BAD_ADDR, "invalid buffer addresses");
 		}
+		if (Au->AuBufSize < Au->AuStreamWorkareaSize() ||
+			!Memory::IsValidRange(Au->AuBuf, Au->AuBufSize) ||
+			!Memory::IsValidRange(Au->PCMBuf, Au->PCMBufSize)) {
+			delete Au;
+			return hleLogError(Log::ME, SCE_MP3_ERROR_BAD_ADDR, "invalid buffer range");
+		}
 		if ((int)Au->AuBufSize < AU_BUF_MIN_SIZE || (int)Au->PCMBufSize < PCM_BUF_MIN_SIZE) {
 			delete Au;
 			return hleLogError(Log::ME, SCE_MP3_ERROR_BAD_SIZE, "buffers too small");
@@ -314,7 +320,17 @@ static u32 sceMp3ReserveMp3Handle(u32 mp3Addr) {
 	Au->SetReadPos(Au->startPos);
 	Au->decoder = CreateAudioDecoder(PSP_CODEC_MP3);
 
-	int handle = (int)g_mp3Map.size();
+	int handle = -1;
+	for (int candidate = 0; candidate < (int)MP3_MAX_HANDLES; ++candidate) {
+		if (g_mp3Map.find(candidate) == g_mp3Map.end()) {
+			handle = candidate;
+			break;
+		}
+	}
+	if (handle < 0) {
+		delete Au;
+		return hleLogError(Log::ME, SCE_MP3_ERROR_NO_RESOURCE_AVAIL, "no free handle");
+	}
 	g_mp3Map[handle] = Au;
 
 	return hleLogDebug(Log::ME, handle);
@@ -424,12 +440,20 @@ static int CalculateMp3SamplesPerFrame(int versionBits, int layerBits) {
 
 static int FindMp3Header(AuCtx *ctx, int &header, int end) {
 	u32 addr = ctx->AuBuf + ctx->AuStreamWorkareaSize();
-	if (Memory::IsValidRange(addr, end)) {
+	int available = std::min<int64_t>(ctx->StreamBytesAvailable(), end);
+	if (available >= 4 && Memory::IsValidRange(addr, available)) {
 		const u8 *ptr = Memory::GetPointerUnchecked(addr);
-		for (int offset = 0; offset < end; ++offset) {
-			// If we hit valid sync bits, then we've found a header.
-			if (ptr[offset] == 0xFF && (ptr[offset + 1] & 0xC0) == 0xC0) {
-				header = bswap32(Memory::ReadUnchecked_U32(addr + offset));
+		for (int offset = 0; offset + 3 < available; ++offset) {
+			if (ptr[offset] != 0xFF || (ptr[offset + 1] & 0xC0) != 0xC0)
+				continue;
+
+			int candidate = bswap32(Memory::ReadUnchecked_U32(addr + offset));
+			int layerBits = (candidate >> 17) & 0x3;
+			int versionBits = (candidate >> 19) & 0x3;
+			int bitrate = __CalculateMp3Bitrates((candidate >> 12) & 0xF, versionBits, layerBits);
+			int sampleRate = __CalculateMp3SampleRates((candidate >> 10) & 0x3, versionBits);
+			if (layerBits == 1 && versionBits != 1 && bitrate > 0 && sampleRate > 0) {
+				header = candidate;
 				return offset;
 			}
 		}
@@ -468,8 +492,7 @@ static int sceMp3Init(u32 mp3) {
 	DEBUG_LOG(Log::ME, "sceMp3Init(): channels=%i, samplerate=%iHz, bitrate=%ikbps, layerBits=%d ,versionBits=%d,HEADER: %08x", channels, samplerate, bitrate, layerBits, versionBits, header);
 
 	if (layerBits != 1) {
-		// TODO: Should return ERROR_AVCODEC_INVALID_DATA.
-		WARN_LOG_REPORT(Log::ME, "sceMp3Init: invalid data: not layer 3");
+		return hleDelayResult(hleReportError(Log::ME, SCE_AVCODEC_ERROR_INVALID_DATA, "invalid MP3 layer %d", layerBits), "mp3 init", PARSE_DELAY_MS);
 	}
 	if (bitrate == 0 || bitrate == -1) {
 		return hleDelayResult(hleReportError(Log::ME, SCE_AVCODEC_ERROR_INVALID_DATA, "invalid bitrate v%d l%d rate %04x", versionBits, layerBits, (header >> 12) & 0xF), "mp3 init", PARSE_DELAY_MS);
@@ -478,9 +501,9 @@ static int sceMp3Init(u32 mp3) {
 		return hleDelayResult(hleReportError(Log::ME, SCE_AVCODEC_ERROR_INVALID_DATA, "invalid sample rate v%d l%d rate %02x", versionBits, layerBits, (header >> 10) & 0x3), "mp3 init", PARSE_DELAY_MS);
 	}
 
-	// Before we allow init, newer SDK versions next require at least 156 bytes.
-	// That happens to be the size of the first frame header for VBR.
-	if (sdkver >= 0x06000000 && ctx->ReadPos() < 156) {
+	// Newer SDK versions require at least 156 bytes of stream data before init.
+	// This covers the initial VBR metadata area used by the PSP implementation.
+	if (sdkver >= 0x06000000 && ctx->StreamBytesAvailable() < 156) {
 		return hleDelayResult(hleLogError(Log::ME, SCE_KERNEL_ERROR_INVALID_VALUE, "insufficient mp3 data for init"), "mp3 init", PARSE_DELAY_MS);
 	}
 
@@ -501,6 +524,8 @@ static int sceMp3Init(u32 mp3) {
 	// Based on bitrate, we can calculate the frame size in bytes.
 	// Note: this doesn't correctly handle padding or slot size, but the PSP doesn't either.
 	uint32_t bytesPerSecond = (ctx->MaxOutputSample / 8) * ctx->BitRate * 1000;
+	if (bytesPerSecond == 0)
+		return hleDelayResult(hleReportError(Log::ME, SCE_AVCODEC_ERROR_INVALID_DATA, "invalid MP3 frame size"), "mp3 init", PARSE_DELAY_MS);
 	// The frame count ignores the upper bits of these sizes, although they are used in cases.
 	uint64_t totalBytes = (ctx->endPos & 0xFFFFFFFF) - (ctx->startPos & 0xFFFFFFFF);
 	ctx->FrameNum = (int)((totalBytes * ctx->SamplingRate) / bytesPerSecond);
@@ -622,6 +647,11 @@ static int sceMp3GetInfoToAddStreamData(u32 mp3, u32 dstPtr, u32 towritePtr, u32
 	} else if (ctx->AuBuf == 0) {
 		return hleLogError(Log::ME, SCE_MP3_ERROR_UNRESERVED_HANDLE, "incorrect handle type");
 	}
+	if (!Memory::IsValidRange(dstPtr, sizeof(u32)) ||
+		!Memory::IsValidRange(towritePtr, sizeof(u32)) ||
+		!Memory::IsValidRange(srcposPtr, sizeof(u32))) {
+		return hleLogError(Log::ME, SCE_KERNEL_ERROR_INVALID_POINTER, "invalid output pointer");
+	}
 
 	return hleLogDebug(Log::ME, ctx->AuGetInfoToAddStreamData(dstPtr, towritePtr, srcposPtr));
 }
@@ -711,6 +741,9 @@ static u32 sceMp3ResetPlayPositionByFrame(u32 mp3, u32 frame) {
 }
 
 static u32 sceMp3LowLevelInit(u32 mp3, u32 unk) {
+	if (!resourceInited || mp3 >= MP3_MAX_HANDLES)
+		return hleLogError(Log::ME, SCE_MP3_ERROR_INVALID_HANDLE, "invalid low-level handle");
+
 	auto ctx = new AuCtx();
 
 	// create mp3 decoder
@@ -740,18 +773,21 @@ static u32 sceMp3LowLevelDecode(u32 mp3, u32 sourceAddr, u32 sourceBytesConsumed
 		return hleLogError(Log::ME, SCE_MP3_ERROR_INVALID_HANDLE, "invalid handle");
 	}
 
-	if (!Memory::IsValidAddress(sourceAddr) || !Memory::IsValidAddress(sourceBytesConsumedAddr) ||
-		!Memory::IsValidAddress(samplesAddr) || !Memory::IsValidAddress(sampleBytesAddr)) {
+	if (!Memory::IsValidRange(sourceBytesConsumedAddr, sizeof(u32)) ||
+		!Memory::IsValidRange(sampleBytesAddr, sizeof(u32)) ||
+		!Memory::IsValidRange(sourceAddr, 4096) ||
+		!Memory::IsValidRange(samplesAddr, 1152 * 2 * sizeof(int16_t))) {
 		return hleLogError(Log::ME, -1, "invalid address in args");
 	}
 
-	const u8 *inbuff = Memory::GetPointerWriteUnchecked(sourceAddr);
+	const u8 *inbuff = Memory::GetPointerUnchecked(sourceAddr);
 	int16_t *outbuf = (int16_t *)Memory::GetPointerWriteUnchecked(samplesAddr);
 	
 	int outSamples = 0;
 	int inbytesConsumed = 0;
 	if (!ctx->decoder->Decode(inbuff, 4096, &inbytesConsumed, 2, outbuf, &outSamples)) {
 		WARN_LOG(Log::ME, "sceMp3LowLevelDecode: Decode failed");
+		return hleLogError(Log::ME, -1, "MP3 decode failed");
 	}
 	int outBytes = outSamples * sizeof(int16_t) * 2;
 	NotifyMemInfo(MemBlockFlags::WRITE, samplesAddr, outBytes, "Mp3LowLevelDecode");

@@ -29,7 +29,7 @@ public:
 
 	virtual PSPAudioType GetAudioType() const = 0;
 
-	// inbytesConsumed can include skipping metadata.
+	// inbytesConsumed can include skipped metadata or input consumed while buffering a partial frame.
 	// outSamples is in stereo samples. So you have to multiply by 4 for 16-bit stereo audio to get bytes.
 	// For Atrac3, if *outSamples != 0, it'll cap the number of samples to output. In this case, its value can only shrink.
 	// TODO: Implement that in the other decoders too, if needed.
@@ -38,6 +38,7 @@ public:
 
 	// NOTE: This can come late (MediaEngine::getAudioSample)! But it will come before the first Decode.
 	virtual void SetChannels(int channels) = 0;
+	// Discard codec/parser state after a seek or stream restart.
 	virtual void FlushBuffers() {}
 
 	// Just metadata.
@@ -58,14 +59,7 @@ public:
 	AuCtx();
 	~AuCtx();
 
-	// MP3 streaming buffer management constants (issue #8672)
-	// These control how much data is buffered before playback starts and during streaming.
-	// Smaller values reduce startup delay (especially on track changes), larger values provide more resilience.
-	static constexpr int STREAMING_CHUNK_MIN_SPACE = 2048;     // Minimum free space before stopping requests
-	static constexpr int STREAMING_CHUNK_INITIAL = 8192;       // Initial/startup chunk size (~20 MP3 frames)
-	static constexpr int STREAMING_CHUNK_ONGOING = 4096;       // Ongoing streaming chunk size (~10 MP3 frames)
-
-	u32 AuDecode(u32 pcmAddr);
+	int AuDecode(u32 pcmAddr);
 
 	u32 AuNotifyAddStreamData(int size);
 	int AuCheckStreamDataNeeded();
@@ -75,8 +69,9 @@ public:
 	u32 AuResetPlayPositionByFrame(int position);
 	u32 AuGetInfoToAddStreamData(u32 bufPtr, u32 sizePtr, u32 srcPosPtr);
 
-	void SetReadPos(int pos) { readPos = pos; }
-	int ReadPos() { return readPos;  }
+	void SetReadPos(int64_t pos) { readPos = pos; }
+	int64_t ReadPos() const { return readPos; }
+	int64_t StreamBytesAvailable() const { return readPos - (int64_t)startPos; }
 
 	void DoState(PointerWrap &p);
 
@@ -118,11 +113,12 @@ private:
 
 	// buffers informations
 	int AuBufAvailable = 0; // the available buffer of AuBuf to be able to recharge data
-	int readPos = 0; // read position in audio source file
-	int askedReadSize = 0; // the size of data requied to be read from file by the game
+	int64_t readPos = 0; // read position in audio source file
+	int askedReadSize = 0; // size of the most recent read request made to the game
 	int nextOutputHalf = 0;
+
+	// MP3 streaming buffer management constants, in bytes.
+	static constexpr int MP3_STREAMING_MIN_SPACE = 2048;
+	static constexpr int MP3_STREAMING_CHUNK_INITIAL = 8192;
+	static constexpr int MP3_STREAMING_CHUNK_ONGOING = 4096;
 };
-
-
-
-
