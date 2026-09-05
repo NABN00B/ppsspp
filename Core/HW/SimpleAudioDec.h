@@ -114,8 +114,9 @@ private:
 	int readPos = 0; // read position in audio source file
 	int askedReadSize = 0; // the size of data requied to be read from file by the game
 	int nextOutputHalf = 0;
+
+	// MP3 streaming buffer management constants
+	static constexpr int MP3_STREAMING_MIN_SPACE = 2048;     // Minimum free space before stopping requests
+	static constexpr int MP3_STREAMING_CHUNK_INITIAL = 8192; // Initial/startup chunk size (~20 MP3 frames)
+	static constexpr int MP3_STREAMING_CHUNK_ONGOING = 4096; // Ongoing streaming chunk size (~10 MP3 frames)
 };
-
-
-
-

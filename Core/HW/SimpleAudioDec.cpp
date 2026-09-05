@@ -571,13 +571,33 @@ int AuCtx::AuCheckStreamDataNeeded() {
 
 int AuCtx::AuStreamBytesNeeded() {
 	if (decoder->GetAudioType() == PSP_CODEC_MP3) {
-		// The endPos and readPos are not considered, except when you've read to the end.
-		if (readPos >= endPos)
-			return 0;
-		// Account for the workarea.
+        // The endPos and readPos are not considered, except when you've read to the end.
+        if (readPos >= endPos)
+            return 0;
+
+        // For streaming (especially track changes), we should start playback as soon as
+        // we have a minimum amount of buffered data, not wait for the entire buffer to fill.
+		int spaceFree = (int)AuBufSize - AuBufAvailable;
+
+        // If we don't have enough space for a reasonable amount of data, don't ask for more.
+        if (spaceFree < MP3_STREAMING_MIN_SPACE)
+            return 0;
+
 		int offset = AuStreamWorkareaSize();
-		return (int)AuBufSize - AuBufAvailable - offset;
-	}
+		int requestedSize = 0;
+
+        // For initial startup or low buffer situations, ask for a modest chunk to avoid
+        // the "pre-fill entire buffer" behavior, while still maintaining good buffering.
+        if (AuBufAvailable < offset + MP3_STREAMING_CHUNK_INITIAL) {
+            requestedSize = std::min(MP3_STREAMING_CHUNK_INITIAL, spaceFree);
+        } else {
+            // Once we have a decent buffer, keep asking for small amounts to top it off.
+            requestedSize = std::min(MP3_STREAMING_CHUNK_ONGOING, spaceFree);
+        }
+
+        // Ensure we don't request more than what is left in the audio stream.
+        return std::min(requestedSize, (int)(endPos - readPos));
+    }
 
 	// TODO: Untested.  Maybe similar to MP3.
 	return std::min((int)AuBufSize - AuBufAvailable, (int)endPos - readPos);
