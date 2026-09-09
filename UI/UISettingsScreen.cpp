@@ -43,9 +43,9 @@
 
 // TODO:
 // - Decide which old Ini strings should be moved to the new UI category.
-// - Finalize the new strings.
-// - Add the new strings to Ini files.
+// - Finalize the new strings and add them to Ini files.
 // - Decide which UI settings should be moved to a new ConfigSetting instance (to be created).
+// - Clean up audio odd behaviors of audio settings and events (also in GameSettingsScreen).
 
 UISettingsScreen::UISettingsScreen(const Path &gamePath)
 	: UITabbedBaseDialogScreen(gamePath, &g_Config.iUISettingsCurrentTab, TabDialogFlags::AddAutoTitles) {
@@ -62,7 +62,7 @@ void UISettingsScreen::CreateTabs() {
 		CreateUISoundsSettings(parent);
 	});
 
-	AddTab("Customization", ui->T("Customization"), [this](UI::LinearLayout *parent) {
+	AddTab("CustomizeGUI", ui->T("Customize GUI"), [this](UI::LinearLayout *parent) {
 		CreateCustomizationSettings(parent);
 	});
 
@@ -79,6 +79,16 @@ void UISettingsScreen::CreateGeneralUISettings(UI::ViewGroup *generalUISettings)
 	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
 
 	generalUISettings->Add(new ItemHeader(ui->T("General UI settings")));
+
+	PopupSliderChoice *uiScale = generalUISettings->Add(new PopupSliderChoice(&g_Config.iUIScaleFactor, -8, 8, 0, sy->T("UI size adjustment (DPI)"), screenManager()));
+	uiScale->SetZeroLabel(sy->T("Off"));
+	UIContext *ctx = screenManager()->getUIContext();
+	uiScale->OnChange.Add([ctx](UI::EventParams &e) {
+		const float dpiMul = UIScaleFactorToMultiplier(g_Config.iUIScaleFactor);
+		g_display.Recalculate(-1, -1, -1, -1, dpiMul);
+		ctx->InvalidateAtlas();
+		NativeResized();
+	});
 
 #if PPSSPP_PLATFORM(IOS)
 	static const char *indicator[] = {
@@ -106,17 +116,7 @@ void UISettingsScreen::CreateGeneralUISettings(UI::ViewGroup *generalUISettings)
 	}
 #endif
 
-	PopupSliderChoice *uiScale = generalUISettings->Add(new PopupSliderChoice(&g_Config.iUIScaleFactor, -8, 8, 0, sy->T("UI size adjustment (DPI)"), screenManager()));
-	uiScale->SetZeroLabel(sy->T("Off"));
-	UIContext *ctx = screenManager()->getUIContext();
-	uiScale->OnChange.Add([ctx](UI::EventParams &e) {
-		const float dpiMul = UIScaleFactorToMultiplier(g_Config.iUIScaleFactor);
-		g_display.Recalculate(-1, -1, -1, -1, dpiMul);
-		ctx->InvalidateAtlas();
-		NativeResized();
-	});
-
-	generalUISettings->Add(new ItemHeader(ui->T("Ingame UI settings")));
+	generalUISettings->Add(new ItemHeader(ui->T("Mid-game UI settings")));
 
 	generalUISettings->Add(new CheckBox(&g_Config.bTransparentBackground, sy->T("Transparent UI background")));
 	generalUISettings->Add(new CheckBox(&g_Config.bShowSaveLoadIndicator, dev->T("Show indicator when saving/loading")));
@@ -138,7 +138,7 @@ void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 	auto a = GetI18NCategory(I18NCat::AUDIO);
 	auto ac = GetI18NCategory(I18NCat::ACHIEVEMENTS);
 
-	uiSoundsSettings->Add(new ItemHeader(ui->T("UI sound volume")));
+	uiSoundsSettings->Add(new ItemHeader(ui->T("UI volume")));
 
 	uiSoundsSettings->Add(new CheckBox(&g_Config.bUISound, a->T("UI sound")));
 	PopupSliderChoice *uiVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iUIVolume, 0, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iUIVolume), a->T("UI volume"), screenManager()));
