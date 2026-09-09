@@ -21,6 +21,8 @@
 #include "Common/Render/DrawBuffer.h"
 #include "Common/UI/PopupScreens.h"
 #include "Common/UI/Root.h"
+#include "Common/UI/ScreenManager.h"
+#include "Common/TimeUtil.h"
 #include "Core/Config.h"
 #include "Core/ConfigValues.h"
 #include "UI/BackgroundAudio.h"
