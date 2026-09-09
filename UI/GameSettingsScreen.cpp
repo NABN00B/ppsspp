@@ -30,6 +30,7 @@
 #include "Common/UI/Notice.h"
 #include "Common/UI/ScreenManager.h"
 #include "Common/BitSet.h"
+#include "Common/VR/PPSSPPVR.h"
 #include "Common/System/Display.h"  // Only to check screen aspect ratio with pixel_yres/pixel_xres
 #include "Common/System/Request.h"
 #include "Common/System/OSD.h"
@@ -71,6 +72,9 @@
 #include "Core/Instance.h"
 #include "Core/System.h"
 #include "Core/Reporting.h"
+#include "Core/HLE/sceUsbCam.h"
+#include "Core/HLE/sceUsbMic.h"
+#include "Core/Util/PortManager.h"
 #include "GPU/Common/PostShader.h"
 #include "GPU/GPU.h"
 
