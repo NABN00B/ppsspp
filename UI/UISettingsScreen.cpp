@@ -19,6 +19,7 @@
 
 #include "Common/Data/Text/I18n.h"
 #include "Common/Render/DrawBuffer.h"
+#include "Common/UI/PopupScreens.h"
 #include "Common/UI/Root.h"
 #include "Core/Config.h"
 #include "Core/ConfigValues.h"
