@@ -424,6 +424,12 @@ public:
 	int iAchievementVolume;
 	int iAltSpeedVolume;
 
+	std::string sUISelectAudioFile;
+	std::string sUIConfirmAudioFile;
+	std::string sUIBackAudioFile;
+	std::string sUIToggleOnAudioFile;
+	std::string sUIToggleOffAudioFile;
+
 	bool bExtraAudioBuffering;  // For bluetooth
 	std::string sAudioDevice;
 	bool bAutoSwitchAudioDevice;

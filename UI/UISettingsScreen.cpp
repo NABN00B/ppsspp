@@ -41,6 +41,12 @@
 #include "UI/RetroAchievementScreens.h"
 #include "UI/Theme.h"
 
+// TODO:
+// - Decide which old Ini strings should be moved to the new UI category.
+// - Finalize the new strings.
+// - Add the new strings to Ini files.
+// - Decide which UI settings should be moved to a new ConfigSetting instance (to be created).
+
 UISettingsScreen::UISettingsScreen(const Path &gamePath)
 	: UITabbedBaseDialogScreen(gamePath, &g_Config.iUISettingsCurrentTab, TabDialogFlags::AddAutoTitles) {
 }
@@ -130,6 +136,7 @@ void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
 	auto a = GetI18NCategory(I18NCat::AUDIO);
+	auto ac = GetI18NCategory(I18NCat::ACHIEVEMENTS);
 
 	uiSoundsSettings->Add(new ItemHeader(ui->T("UI sound volume")));
 
@@ -150,17 +157,30 @@ void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 	});
 	uiVolume->SetEnabledPtr(&g_Config.bUISound);
 
+	PopupSliderChoice *achievementVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iAchievementVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iAchievementVolume), ac->T("Achievement sound volume"), screenManager()));
+	achievementVolume->SetFormat("%d%%");
+	achievementVolume->SetEnabledPtr(&g_Config.bEnableSound);
+	achievementVolume->SetZeroLabel(a->T("Mute"));
+	achievementVolume->OnChange.Add([](UI::EventParams &e) {
+		// Audio preview
+		float achievementVolume = Volume100ToMultiplier(g_Config.iAchievementVolume);
+		g_BackgroundAudio.SFX().Play(UI::UISound::ACHIEVEMENT_UNLOCKED, achievementVolume);
+	});
+
 	PopupSliderChoice *gamePreviewVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iGamePreviewVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iGamePreviewVolume), a->T("Game preview volume"), screenManager()));
 	gamePreviewVolume->SetFormat("%d%%");
 	gamePreviewVolume->SetZeroLabel(a->T("Mute"));
 
-	uiSoundsSettings->Add(new ItemHeader(ui->T("Customize sound effects")));
-
-	uiSoundsSettings->Add(new ItemHeader(ui->T("RetroAchievements")));
-	uiSoundsSettings->Add(new Choice(ui->T("RetroAchievements sounds")))->OnClick.Add([this](UI::EventParams &) {
-		g_Config.iRetroAchievementsSettingsCurrentTab = 1;
-		screenManager()->push(new RetroAchievementsSettingsScreen(gamePath_));
-	});
+	if (System_GetPropertyBool(SYSPROP_HAS_FILE_BROWSER)) {
+		uiSoundsSettings->Add(new ItemHeader(ui->T("Customize sound effects")));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sUISelectAudioFile, ui->T("Select"), UISound::SELECT));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sUIConfirmAudioFile, ui->T("Confirm"), UISound::CONFIRM));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sUIBackAudioFile, ui->T("Back"), UISound::BACK));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sUIToggleOnAudioFile, ui->T("Toggle on"), UISound::TOGGLE_ON));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sUIToggleOffAudioFile, ui->T("Toggle off"), UISound::TOGGLE_OFF));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sAchievementsUnlockAudioFile, ac->T("Achievement unlocked"), UISound::ACHIEVEMENT_UNLOCKED));
+		uiSoundsSettings->Add(new AudioFileChooser(GetRequesterToken(), &g_Config.sAchievementsLeaderboardSubmitAudioFile, ac->T("Leaderboard score submission"), UISound::LEADERBOARD_SUBMITTED));
+	}
 }
 
 void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationSettings) {
