@@ -13,8 +13,8 @@ public:
 	const char *tag() const override { return "UISettings"; }
 
 private:
-	void CreateGeneralUISettings(UI::LinearLayout *parent);
-	void CreateUISoundsSettings(UI::LinearLayout *parent);
-	void CreateCustomizationSettings(UI::LinearLayout *parent);
-	void CreateAccessibilitySettings(UI::LinearLayout *parent);
+	void CreateGeneralUISettings(UI::ViewGroup *generalUISettings);
+	void CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings);
+	void CreateCustomizationSettings(UI::ViewGroup *customizationSettings);
+	void CreateAccessibilitySettings(UI::ViewGroup *accessibilitySettings);
 };

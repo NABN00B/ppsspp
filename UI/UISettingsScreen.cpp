@@ -18,7 +18,13 @@
 #include "UI/UISettingsScreen.h"
 
 #include "Common/Data/Text/I18n.h"
+#include "Common/Render/DrawBuffer.h"
+#include "Common/UI/Root.h"
+#include "Core/Config.h"
+#include "Core/ConfigValues.h"
+#include "UI/BackgroundAudio.h"
 #include "UI/MiscViews.h"
+#include "UI/Theme.h"
 
 UISettingsScreen::UISettingsScreen(const Path &gamePath)
 	: UITabbedBaseDialogScreen(gamePath, nullptr, TabDialogFlags::AddAutoTitles) {
@@ -47,8 +53,7 @@ void UISettingsScreen::CreateTabs() {
 void UISettingsScreen::CreateGeneralUISettings(UI::ViewGroup *generalUISettings) {
 	using namespace UI;
 
-	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
-    auto sy = GetI18NCategory(I18NCat::SYSTEM);
+	auto sy = GetI18NCategory(I18NCat::SYSTEM);
 	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
 
      // Shared with achievements.
@@ -61,8 +66,8 @@ void UISettingsScreen::CreateGeneralUISettings(UI::ViewGroup *generalUISettings)
 void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 	using namespace UI;
 
-	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
 	auto a = GetI18NCategory(I18NCat::AUDIO);
+	auto ac = GetI18NCategory(I18NCat::ACHIEVEMENTS);
 
 	PopupSliderChoice *achievementVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iAchievementVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iAchievementVolume), ac->T("Achievement sound volume"), screenManager()));
 	achievementVolume->SetFormat("%d%%");
@@ -102,10 +107,9 @@ void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationS
 	using namespace UI;
 
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
-    auto th = GetI18NCategory(I18NCat::THEMES);
-    auto sy = GetI18NCategory(I18NCat::SYSTEM);
+	auto sy = GetI18NCategory(I18NCat::SYSTEM);
 
-    customizationSettings->Add(new ItemHeader(ui->T("Customization")));
+	customizationSettings->Add(new ItemHeader(ui->T("Customization")));
 
 	static const char *backgroundAnimations[] = { "No animation", "Floating symbols", "Recent games", "Waves", "Moving background", "Bouncing icon", "Colored floating symbols" };
 	customizationSettings->Add(new PopupMultiChoice(&g_Config.iBackgroundAnimation, sy->T("UI background animation"), backgroundAnimations, 0, ARRAY_SIZE(backgroundAnimations), I18NCat::SYSTEM, screenManager()));
@@ -136,7 +140,5 @@ void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationS
 }
 
 void UISettingsScreen::CreateAccessibilitySettings(UI::ViewGroup *accessibilitySettings) {
-	using namespace UI;
-
-	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
+	(void)accessibilitySettings;
 }
