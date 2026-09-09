@@ -17,4 +17,6 @@ private:
 	void CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings);
 	void CreateCustomizationSettings(UI::ViewGroup *customizationSettings);
 	void CreateAccessibilitySettings(UI::ViewGroup *accessibilitySettings);
+	void OnImmersiveModeChange(UI::EventParams &e);
+	void OnChangeBackground(UI::EventParams &e);
 };

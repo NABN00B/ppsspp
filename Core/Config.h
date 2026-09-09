@@ -443,6 +443,8 @@ public:
 	bool bTransparentBackground;
 	int iSettingsCurrentTab;
 	int iDeveloperSettingsCurrentTab;
+	int iRetroAchievementsSettingsCurrentTab;
+	int iUISettingsCurrentTab;
 
 	std::string sThemeName;
 

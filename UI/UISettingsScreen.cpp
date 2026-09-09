@@ -18,19 +18,31 @@
 #include "UI/UISettingsScreen.h"
 
 #include "Common/Data/Text/I18n.h"
+#include "Common/File/FileUtil.h"
+#include "Common/Log.h"
+#include "Common/Render/ManagedTexture.h"
 #include "Common/Render/DrawBuffer.h"
+#include "Common/System/Display.h"
+#include "Common/System/NativeApp.h"
+#include "Common/System/OSD.h"
+#include "Common/System/Request.h"
+#include "Common/System/System.h"
 #include "Common/UI/PopupScreens.h"
 #include "Common/UI/Root.h"
 #include "Common/UI/ScreenManager.h"
 #include "Common/TimeUtil.h"
 #include "Core/Config.h"
 #include "Core/ConfigValues.h"
+#include "Core/System.h"
+#include "Core/Util/PathUtil.h"
 #include "UI/BackgroundAudio.h"
+#include "UI/Background.h"
 #include "UI/MiscViews.h"
+#include "UI/RetroAchievementScreens.h"
 #include "UI/Theme.h"
 
 UISettingsScreen::UISettingsScreen(const Path &gamePath)
-	: UITabbedBaseDialogScreen(gamePath, nullptr, TabDialogFlags::AddAutoTitles) {
+	: UITabbedBaseDialogScreen(gamePath, &g_Config.iUISettingsCurrentTab, TabDialogFlags::AddAutoTitles) {
 }
 
 void UISettingsScreen::CreateTabs() {
@@ -40,7 +52,7 @@ void UISettingsScreen::CreateTabs() {
 		CreateGeneralUISettings(parent);
 	});
 
-	AddTab("UISounds", ui->T("UI sounds"), [this](UI::LinearLayout *parent) {
+	AddTab("UISounds", ui->T("UI sound"), [this](UI::LinearLayout *parent) {
 		CreateUISoundsSettings(parent);
 	});
 
@@ -56,33 +68,70 @@ void UISettingsScreen::CreateTabs() {
 void UISettingsScreen::CreateGeneralUISettings(UI::ViewGroup *generalUISettings) {
 	using namespace UI;
 
+	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
 	auto sy = GetI18NCategory(I18NCat::SYSTEM);
 	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
 
-     // Shared with achievements.
+	generalUISettings->Add(new ItemHeader(ui->T("General UI settings")));
+
+#if PPSSPP_PLATFORM(IOS)
+	static const char *indicator[] = {
+		"Swipe once to switch app (indicator auto-hides)",
+		"Swipe twice to switch app (indicator stays visible)"
+	};
+
+	PopupMultiChoice *switchMode = generalUISettings->Add(new PopupMultiChoice(&g_Config.iAppSwitchMode, sy->T("App switching mode"), indicator, 0, ARRAY_SIZE(indicator), I18NCat::SYSTEM, screenManager()));
+	switchMode->OnChoice.Add([](EventParams &e) {
+		System_Notify(SystemNotification::APP_SWITCH_MODE_CHANGED);
+	});
+
+	// Note: On iPhone, iOS hides the status bar in landscape no matter what this is set to.
+	DisplayLayoutConfig &config = g_Config.GetDisplayLayoutConfig(GetDeviceOrientation());
+	generalUISettings->Add(new CheckBox(&config.bImmersiveMode, sy->T("Hide status bar")))->OnClick.Add([](EventParams &e) {
+		System_Notify(SystemNotification::IMMERSIVE_MODE_CHANGE);
+	});
+#endif
+
+#if PPSSPP_PLATFORM(ANDROID)
+	// Hide Immersive Mode on pre-kitkat Android
+	if (System_GetPropertyInt(SYSPROP_SYSTEMVERSION) >= 19) {
+		DisplayLayoutConfig &config = g_Config.GetDisplayLayoutConfig(GetDeviceOrientation());
+		generalUISettings->Add(new CheckBox(&config.bImmersiveMode, sy->T("Hide navigation bar")))->OnClick.Handle(this, &UISettingsScreen::OnImmersiveModeChange);
+	}
+#endif
+
+	PopupSliderChoice *uiScale = generalUISettings->Add(new PopupSliderChoice(&g_Config.iUIScaleFactor, -8, 8, 0, sy->T("UI size adjustment (DPI)"), screenManager()));
+	uiScale->SetZeroLabel(sy->T("Off"));
+	UIContext *ctx = screenManager()->getUIContext();
+	uiScale->OnChange.Add([ctx](UI::EventParams &e) {
+		const float dpiMul = UIScaleFactorToMultiplier(g_Config.iUIScaleFactor);
+		g_display.Recalculate(-1, -1, -1, -1, dpiMul);
+		ctx->InvalidateAtlas();
+		NativeResized();
+	});
+
+	generalUISettings->Add(new ItemHeader(ui->T("Ingame UI settings")));
+
+	generalUISettings->Add(new CheckBox(&g_Config.bTransparentBackground, sy->T("Transparent UI background")));
+	generalUISettings->Add(new CheckBox(&g_Config.bShowSaveLoadIndicator, dev->T("Show indicator when saving/loading")));
+
+    // Shared with achievements.
 	static const char *positions[] = { "None", "Bottom Left", "Bottom Center", "Bottom Right", "Top Left", "Top Center", "Top Right", "Center Left", "Center Right" };
 	generalUISettings->Add(new PopupMultiChoice(&g_Config.iNotificationPos, sy->T("Notification screen position"), positions, -1, ARRAY_SIZE(positions), I18NCat::DIALOG, screenManager()));
 
-	generalUISettings->Add(new CheckBox(&g_Config.bShowSaveLoadIndicator, dev->T("Show indicator when saving/loading")));
+	generalUISettings->Add(new Choice(ui->T("RetroAchievements notifications")))->OnClick.Add([this](UI::EventParams &) {
+		g_Config.iRetroAchievementsSettingsCurrentTab = 1;
+		screenManager()->push(new RetroAchievementsSettingsScreen(gamePath_));
+	});
 }
 
 void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 	using namespace UI;
 
+	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
 	auto a = GetI18NCategory(I18NCat::AUDIO);
-	auto ac = GetI18NCategory(I18NCat::ACHIEVEMENTS);
 
-	PopupSliderChoice *achievementVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iAchievementVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iAchievementVolume), ac->T("Achievement sound volume"), screenManager()));
-	achievementVolume->SetFormat("%d%%");
-	achievementVolume->SetEnabledPtr(&g_Config.bEnableSound);
-	achievementVolume->SetZeroLabel(a->T("Mute"));
-	achievementVolume->OnChange.Add([](UI::EventParams &e) {
-		// Audio preview
-		float achievementVolume = Volume100ToMultiplier(g_Config.iAchievementVolume);
-		g_BackgroundAudio.SFX().Play(UI::UISound::ACHIEVEMENT_UNLOCKED, achievementVolume);
-	});
-
-	uiSoundsSettings->Add(new ItemHeader(a->T("UI sound")));
+	uiSoundsSettings->Add(new ItemHeader(ui->T("UI sound volume")));
 
 	uiSoundsSettings->Add(new CheckBox(&g_Config.bUISound, a->T("UI sound")));
 	PopupSliderChoice *uiVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iUIVolume, 0, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iUIVolume), a->T("UI volume"), screenManager()));
@@ -104,6 +153,14 @@ void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 	PopupSliderChoice *gamePreviewVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iGamePreviewVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iGamePreviewVolume), a->T("Game preview volume"), screenManager()));
 	gamePreviewVolume->SetFormat("%d%%");
 	gamePreviewVolume->SetZeroLabel(a->T("Mute"));
+
+	uiSoundsSettings->Add(new ItemHeader(ui->T("Customize sound effects")));
+
+	uiSoundsSettings->Add(new ItemHeader(ui->T("RetroAchievements")));
+	uiSoundsSettings->Add(new Choice(ui->T("RetroAchievements sounds")))->OnClick.Add([this](UI::EventParams &) {
+		g_Config.iRetroAchievementsSettingsCurrentTab = 1;
+		screenManager()->push(new RetroAchievementsSettingsScreen(gamePath_));
+	});
 }
 
 void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationSettings) {
@@ -112,10 +169,24 @@ void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationS
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
 	auto sy = GetI18NCategory(I18NCat::SYSTEM);
 
-	customizationSettings->Add(new ItemHeader(ui->T("Customization")));
+	customizationSettings->Add(new ItemHeader(ui->T("Background")));
+
+	const Path bgPng = GetSysDirectory(DIRECTORY_SYSTEM) / "background.png";
+	const Path bgJpg = GetSysDirectory(DIRECTORY_SYSTEM) / "background.jpg";
+	Choice *backgroundChoice = nullptr;
+	if (File::Exists(bgPng) || File::Exists(bgJpg)) {
+		backgroundChoice = customizationSettings->Add(new Choice(sy->T("Clear UI background")));
+	} else if (System_GetPropertyBool(SYSPROP_HAS_IMAGE_BROWSER) || System_GetPropertyBool(SYSPROP_HAS_FILE_BROWSER)) {
+		backgroundChoice = customizationSettings->Add(new Choice(sy->T("Set UI background...")));
+	}
+	if (backgroundChoice) {
+		backgroundChoice->OnClick.Handle(this, &UISettingsScreen::OnChangeBackground);
+	}
 
 	static const char *backgroundAnimations[] = { "No animation", "Floating symbols", "Recent games", "Waves", "Moving background", "Bouncing icon", "Colored floating symbols" };
 	customizationSettings->Add(new PopupMultiChoice(&g_Config.iBackgroundAnimation, sy->T("UI background animation"), backgroundAnimations, 0, ARRAY_SIZE(backgroundAnimations), I18NCat::SYSTEM, screenManager()));
+
+	customizationSettings->Add(new ItemHeader(ui->T("Theme")));
 
 	PopupMultiChoiceDynamic *theme = customizationSettings->Add(new PopupMultiChoiceDynamic(&g_Config.sThemeName, sy->T("Theme"), GetThemeInfoNames(), I18NCat::THEMES, screenManager()));
 	theme->OnChoice.Add([](EventParams &e) {
@@ -144,4 +215,73 @@ void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationS
 
 void UISettingsScreen::CreateAccessibilitySettings(UI::ViewGroup *accessibilitySettings) {
 	(void)accessibilitySettings;
+}
+
+void UISettingsScreen::OnImmersiveModeChange(UI::EventParams &e) {
+	System_Notify(SystemNotification::IMMERSIVE_MODE_CHANGE);
+	if (g_Config.iAndroidHwScale != 0) {
+		System_RecreateActivity();
+	}
+}
+
+void UISettingsScreen::OnChangeBackground(UI::EventParams &e) {
+	const Path bgPng = GetSysDirectory(DIRECTORY_SYSTEM) / "background.png";
+	const Path bgJpg = GetSysDirectory(DIRECTORY_SYSTEM) / "background.jpg";
+
+	if (File::Exists(bgPng) || File::Exists(bgJpg)) {
+		INFO_LOG(Log::UI, "Clearing background image.");
+		// The button is in clear mode.
+		File::Delete(bgPng);
+		File::Delete(bgJpg);
+		UIBackgroundShutdown();
+		RecreateViews();
+		return;
+	}
+
+	auto sy = GetI18NCategory(I18NCat::SYSTEM);
+	System_BrowseForImage(GetRequesterToken(), sy->T("Set UI background..."), bgJpg, [this](std::string_view value, int converted) {
+		if (converted == 1) {
+			// The platform code converted and saved the file to the desired path already.
+			INFO_LOG(Log::UI, "Platform converted the file: %.*s", STR_VIEW(value));
+		} else if (!value.empty()) {
+			Path path(value);
+
+			// Check the file format. Don't rely on the file extension here due to scoped storage URLs.
+			FILE *f = File::OpenCFile(path, "rb");
+			uint8_t buffer[8];
+			ImageFileType type = ImageFileType::UNKNOWN;
+			if (f != nullptr && 8 == fread(buffer, 1, ARRAY_SIZE(buffer), f)) {
+				type = DetectImageFileType(buffer, ARRAY_SIZE(buffer));
+			}
+
+			std::string filename;
+			switch (type) {
+			case ImageFileType::JPEG:
+				filename = "background.jpg";
+				break;
+			case ImageFileType::PNG:
+				filename = "background.png";
+				break;
+			default:
+				break;
+			}
+
+			if (!filename.empty()) {
+				Path dest = GetSysDirectory(DIRECTORY_SYSTEM) / filename;
+				File::Copy(path, dest);
+				if (path.FilePathContainsNoCase("temp_import.jpg")) {
+					INFO_LOG(Log::UI, "Deleting temp file: %s", GetFriendlyPath(path).c_str());
+					File::Delete(path);
+				}
+			} else {
+				auto sy = GetI18NCategory(I18NCat::SYSTEM);
+				g_OSD.Show(OSDType::MESSAGE_ERROR, sy->T("Only JPG and PNG images are supported"), path.GetFilename(), 5.0);
+			}
+		}
+		// It will init again automatically.  We can't init outside a frame on Vulkan.
+		UIBackgroundShutdown();
+		RecreateViews();
+	});
+
+	// Change to a browse or clear button.
 }

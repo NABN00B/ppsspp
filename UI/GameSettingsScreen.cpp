@@ -21,9 +21,7 @@
 #include <algorithm>
 #include <set>
 
-#include "Common/Net/Resolve.h"
 #include "Common/Audio/AudioBackend.h"
-#include "Common/GPU/OpenGL/GLFeatures.h"
 #include "Common/Render/DrawBuffer.h"
 #include "Common/UI/Root.h"
 #include "Common/UI/View.h"
@@ -31,8 +29,6 @@
 #include "Common/UI/Context.h"
 #include "Common/UI/Notice.h"
 #include "Common/UI/ScreenManager.h"
-#include "Common/Render/ManagedTexture.h"
-#include "Common/VR/PPSSPPVR.h"
 #include "Common/BitSet.h"
 #include "Common/System/Display.h"  // Only to check screen aspect ratio with pixel_yres/pixel_xres
 #include "Common/System/Request.h"
@@ -40,7 +36,6 @@
 #include "Common/System/NativeApp.h"
 #include "Common/Data/Color/RGBAUtil.h"
 #include "Common/Data/Text/I18n.h"
-#include "Common/Data/Encoding/Utf8.h"
 #include "Common/UI/PopupScreens.h"
 #include "UI/EmuScreen.h"
 #include "UI/GameSettingsScreen.h"
@@ -73,14 +68,9 @@
 #include "Core/Config.h"
 #include "Core/ConfigValues.h"
 #include "Core/KeyMap.h"
-#include "Core/TiltEventProcessor.h"
 #include "Core/Instance.h"
 #include "Core/System.h"
 #include "Core/Reporting.h"
-#include "Core/HLE/sceUsbCam.h"
-#include "Core/HLE/sceUsbMic.h"
-#include "Core/HLE/sceUtility.h"
-#include "Core/Util/PortManager.h"
 #include "GPU/Common/PostShader.h"
 #include "GPU/GPU.h"
 
@@ -1174,57 +1164,6 @@ void GameSettingsScreen::CreateSystemSettings(UI::ViewGroup *systemSettings) {
 		screenManager()->push(new UISettingsScreen(gamePath_));
 	});
 
-#if PPSSPP_PLATFORM(IOS)
-	static const char *indicator[] = {
-		"Swipe once to switch app (indicator auto-hides)",
-		"Swipe twice to switch app (indicator stays visible)"
-	};
-	PopupMultiChoice *switchMode = systemSettings->Add(new PopupMultiChoice(&g_Config.iAppSwitchMode, sy->T("App switching mode"), indicator, 0, ARRAY_SIZE(indicator), I18NCat::SYSTEM, screenManager()));
-	switchMode->OnChoice.Add([](EventParams &e) {
-		System_Notify(SystemNotification::APP_SWITCH_MODE_CHANGED);
-	});
-
-	{
-		// Note: On iPhone, iOS hides the status bar in landscape no matter what this is set to.
-		DisplayLayoutConfig &config = g_Config.GetDisplayLayoutConfig(GetDeviceOrientation());
-		systemSettings->Add(new CheckBox(&config.bImmersiveMode, sy->T("Hide status bar")))->OnClick.Add([](EventParams &e) {
-			System_Notify(SystemNotification::IMMERSIVE_MODE_CHANGE);
-		});
-	}
-#endif
-
-#if PPSSPP_PLATFORM(ANDROID)
-	// Hide Immersive Mode on pre-kitkat Android
-	if (System_GetPropertyInt(SYSPROP_SYSTEMVERSION) >= 19) {
-		DisplayLayoutConfig &config = g_Config.GetDisplayLayoutConfig(GetDeviceOrientation());
-		systemSettings->Add(new CheckBox(&config.bImmersiveMode, sy->T("Hide navigation bar")))->OnClick.Handle(this, &GameSettingsScreen::OnImmersiveModeChange);
-	}
-#endif
-
-	PopupSliderChoice *uiScale = systemSettings->Add(new PopupSliderChoice(&g_Config.iUIScaleFactor, -8, 8, 0, sy->T("UI size adjustment (DPI)"), screenManager()));
-	uiScale->SetZeroLabel(sy->T("Off"));
-	UIContext *ctx = screenManager()->getUIContext();
-	uiScale->OnChange.Add([ctx](UI::EventParams &e) {
-		const float dpiMul = UIScaleFactorToMultiplier(g_Config.iUIScaleFactor);
-		g_display.Recalculate(-1, -1, -1, -1, dpiMul);
-		ctx->InvalidateAtlas();
-		NativeResized();
-	});
-
-	const Path bgPng = GetSysDirectory(DIRECTORY_SYSTEM) / "background.png";
-	const Path bgJpg = GetSysDirectory(DIRECTORY_SYSTEM) / "background.jpg";
-	Choice *backgroundChoice = nullptr;
-	if (File::Exists(bgPng) || File::Exists(bgJpg)) {
-		backgroundChoice = systemSettings->Add(new Choice(sy->T("Clear UI background")));
-	} else if (System_GetPropertyBool(SYSPROP_HAS_IMAGE_BROWSER) || System_GetPropertyBool(SYSPROP_HAS_FILE_BROWSER)) {
-		backgroundChoice = systemSettings->Add(new Choice(sy->T("Set UI background...")));
-	}
-	if (backgroundChoice) {
-		backgroundChoice->OnClick.Handle(this, &GameSettingsScreen::OnChangeBackground);
-	}
-
-	systemSettings->Add(new CheckBox(&g_Config.bTransparentBackground, sy->T("Transparent UI background")));
-
 	systemSettings->Add(new ItemHeader(sy->T("PSP Memory Stick")));
 
 	if (System_GetPropertyBool(SYSPROP_HAS_OPEN_DIRECTORY)) {
@@ -1491,13 +1430,6 @@ void GameSettingsScreen::CreateVRSettings(UI::ViewGroup *vrSettings) {
 	vrSettings->Add(new CheckBox(&g_Config.bManualForceVR, vr->T("Manual switching between flat screen and VR using SCREEN key")));
 }
 
-void GameSettingsScreen::OnImmersiveModeChange(UI::EventParams &e) {
-	System_Notify(SystemNotification::IMMERSIVE_MODE_CHANGE);
-	if (g_Config.iAndroidHwScale != 0) {
-		System_RecreateActivity();
-	}
-}
-
 void GameSettingsScreen::OnSustainedPerformanceModeChange(UI::EventParams &e) {
 	System_Notify(SystemNotification::SUSTAINED_PERF_CHANGE);
 }
@@ -1568,68 +1500,6 @@ void GameSettingsScreen::OnMemoryStickOther(UI::EventParams &e) {
 }
 
 #endif
-
-void GameSettingsScreen::OnChangeBackground(UI::EventParams &e) {
-	const Path bgPng = GetSysDirectory(DIRECTORY_SYSTEM) / "background.png";
-	const Path bgJpg = GetSysDirectory(DIRECTORY_SYSTEM) / "background.jpg";
-
-	if (File::Exists(bgPng) || File::Exists(bgJpg)) {
-		INFO_LOG(Log::UI, "Clearing background image.");
-		// The button is in clear mode.
-		File::Delete(bgPng);
-		File::Delete(bgJpg);
-		UIBackgroundShutdown();
-		RecreateViews();
-		return;
-	}
-
-	auto sy = GetI18NCategory(I18NCat::SYSTEM);
-	System_BrowseForImage(GetRequesterToken(), sy->T("Set UI background..."), bgJpg, [this](std::string_view value, int converted) {
-		if (converted == 1) {
-			// The platform code converted and saved the file to the desired path already.
-			INFO_LOG(Log::UI, "Platform converted the file: %.*s", STR_VIEW(value));
-		} else if (!value.empty()) {
-			Path path(value);
-
-			// Check the file format. Don't rely on the file extension here due to scoped storage URLs.
-			FILE *f = File::OpenCFile(path, "rb");
-			uint8_t buffer[8];
-			ImageFileType type = ImageFileType::UNKNOWN;
-			if (f != nullptr && 8 == fread(buffer, 1, ARRAY_SIZE(buffer), f)) {
-				type = DetectImageFileType(buffer, ARRAY_SIZE(buffer));
-			}
-
-			std::string filename;
-			switch (type) {
-			case ImageFileType::JPEG:
-				filename = "background.jpg";
-				break;
-			case ImageFileType::PNG:
-				filename = "background.png";
-				break;
-			default:
-				break;
-			}
-
-			if (!filename.empty()) {
-				Path dest = GetSysDirectory(DIRECTORY_SYSTEM) / filename;
-				File::Copy(path, dest);
-				if (path.FilePathContainsNoCase("temp_import.jpg")) {
-					INFO_LOG(Log::UI, "Deleting temp file: %s", GetFriendlyPath(path).c_str());
-					File::Delete(path);
-				}
-			} else {
-				auto sy = GetI18NCategory(I18NCat::SYSTEM);
-				g_OSD.Show(OSDType::MESSAGE_ERROR, sy->T("Only JPG and PNG images are supported"), path.GetFilename(), 5.0);
-			}
-		}
-		// It will init again automatically.  We can't init outside a frame on Vulkan.
-		UIBackgroundShutdown();
-		RecreateViews();
-	});
-
-	// Change to a browse or clear button.
-}
 
 void GameSettingsScreen::dialogFinished(const Screen *dialog, DialogResult result) {
 	if (equals(dialog->tag(), "NewLanguage") && result == DR_OK) {
