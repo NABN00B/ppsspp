@@ -44,24 +44,61 @@ void UISettingsScreen::CreateTabs() {
 	});
 }
 
-void UISettingsScreen::CreateGeneralUISettings(UI::LinearLayout *parent) {
+void UISettingsScreen::CreateGeneralUISettings(UI::ViewGroup *generalUISettings) {
 	using namespace UI;
 
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
     auto sy = GetI18NCategory(I18NCat::SYSTEM);
+	auto dev = GetI18NCategory(I18NCat::DEVELOPER);
 
      // Shared with achievements.
 	static const char *positions[] = { "None", "Bottom Left", "Bottom Center", "Bottom Right", "Top Left", "Top Center", "Top Right", "Center Left", "Center Right" };
-	customizationSettings->Add(new PopupMultiChoice(&g_Config.iNotificationPos, sy->T("Notification screen position"), positions, -1, ARRAY_SIZE(positions), I18NCat::DIALOG, screenManager()));
+	generalUISettings->Add(new PopupMultiChoice(&g_Config.iNotificationPos, sy->T("Notification screen position"), positions, -1, ARRAY_SIZE(positions), I18NCat::DIALOG, screenManager()));
+
+	generalUISettings->Add(new CheckBox(&g_Config.bShowSaveLoadIndicator, dev->T("Show indicator when saving/loading")));
 }
 
-void UISettingsScreen::CreateUISoundsSettings(UI::LinearLayout *parent) {
+void UISettingsScreen::CreateUISoundsSettings(UI::ViewGroup *uiSoundsSettings) {
 	using namespace UI;
 
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
+	auto a = GetI18NCategory(I18NCat::AUDIO);
+
+	PopupSliderChoice *achievementVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iAchievementVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iAchievementVolume), ac->T("Achievement sound volume"), screenManager()));
+	achievementVolume->SetFormat("%d%%");
+	achievementVolume->SetEnabledPtr(&g_Config.bEnableSound);
+	achievementVolume->SetZeroLabel(a->T("Mute"));
+	achievementVolume->OnChange.Add([](UI::EventParams &e) {
+		// Audio preview
+		float achievementVolume = Volume100ToMultiplier(g_Config.iAchievementVolume);
+		g_BackgroundAudio.SFX().Play(UI::UISound::ACHIEVEMENT_UNLOCKED, achievementVolume);
+	});
+
+	uiSoundsSettings->Add(new ItemHeader(a->T("UI sound")));
+
+	uiSoundsSettings->Add(new CheckBox(&g_Config.bUISound, a->T("UI sound")));
+	PopupSliderChoice *uiVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iUIVolume, 0, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iUIVolume), a->T("UI volume"), screenManager()));
+	uiVolume->SetFormat("%d%%");
+	uiVolume->SetZeroLabel(a->T("Mute"));
+	uiVolume->SetLiveUpdate(true);
+	uiVolume->OnChange.Add([](UI::EventParams &e) {
+		static double lastTimePlayed = 0.0;
+		double now = time_now_d();
+		if (now - lastTimePlayed < 0.1) {
+			return; // Don't play if we just played one, to avoid spamming when dragging.
+		}
+		lastTimePlayed = now;
+		// Audio preview
+		PlayUISound(UI::UISound::CONFIRM);
+	});
+	uiVolume->SetEnabledPtr(&g_Config.bUISound);
+
+	PopupSliderChoice *gamePreviewVolume = uiSoundsSettings->Add(new PopupSliderChoice(&g_Config.iGamePreviewVolume, VOLUME_OFF, VOLUMEHI_FULL, Config::GetDefaultValueInt(&g_Config.iGamePreviewVolume), a->T("Game preview volume"), screenManager()));
+	gamePreviewVolume->SetFormat("%d%%");
+	gamePreviewVolume->SetZeroLabel(a->T("Mute"));
 }
 
-void UISettingsScreen::CreateCustomizationSettings(UI::LinearLayout *customizationSettings) {
+void UISettingsScreen::CreateCustomizationSettings(UI::ViewGroup *customizationSettings) {
 	using namespace UI;
 
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
@@ -98,7 +135,7 @@ void UISettingsScreen::CreateCustomizationSettings(UI::LinearLayout *customizati
 	}
 }
 
-void UISettingsScreen::CreateAccessibilitySettings(UI::LinearLayout *parent) {
+void UISettingsScreen::CreateAccessibilitySettings(UI::ViewGroup *accessibilitySettings) {
 	using namespace UI;
 
 	auto ui = GetI18NCategory(I18NCat::UISETTINGS);
